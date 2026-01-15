@@ -161,7 +161,7 @@ export default function Home() {
 
   return loading || saving ? (
     <div className="flex items-center justify-center mt-60 gap-2">
-      <Image src="/loader2.gif" alt="Loading" width={400} height={400 } />
+      <Image src="/loader2.gif" alt="Loading" width={400} height={400} />
     </div>
   ) : (
     <main className="min-h-screen bg-[#f3efe5] text-[#2f2a20]">
@@ -211,13 +211,13 @@ export default function Home() {
           <h2 className="text-lg tracking-wide">Agregar show</h2>
 
           <form onSubmit={onSubmit} className="mt-4 grid gap-3 md:grid-cols-4">
-            <div className="md:col-span-1">
+            <div className="md:col-span-1 min-w-0">
               <label className="block text-xs opacity-70 mb-1">Fecha</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                className="block w-full min-w-0 rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
               />
             </div>
 
@@ -307,7 +307,14 @@ export default function Home() {
         </section>
 
         <footer className="mt-8 text-xs opacity-60">
-          Hecho por <a className='underline underline-offset-2' href="https://github.com/mdtrunzo" target='_blank'>@mdtrunzo</a> 
+          Hecho por{' '}
+          <a
+            className="underline underline-offset-2"
+            href="https://github.com/mdtrunzo"
+            target="_blank"
+          >
+            @mdtrunzo
+          </a>
         </footer>
       </div>
     </main>
