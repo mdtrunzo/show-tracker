@@ -5,7 +5,7 @@ import Image from 'next/image'
 
 type ShowRow = {
   id: string
-  show_date: string // YYYY-MM-DD
+  show_date: string
   venue: string
   band: string
 }
@@ -25,21 +25,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // token (solo vos) guardado en localStorage
-  const [tokenInput, setTokenInput] = useState('')
-
-  useEffect(() => {
-    setTokenInput(localStorage.getItem('showtracker_token') || '')
-  }, [])
-
-  function saveToken() {
-    localStorage.setItem('showtracker_token', tokenInput.trim())
-  }
-
-  function getToken() {
-    return localStorage.getItem('showtracker_token') || ''
-  }
 
   async function loadShows(selectedYear: number) {
     setLoading(true)
@@ -86,21 +71,12 @@ export default function Home() {
       return
     }
 
-    const token = getToken()
-    if (!token) {
-      setError('Falta el Admin token (guardalo una vez y listo).')
-      return
-    }
-
     setSaving(true)
 
     try {
       const res = await fetch('/api/shows', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-app-token': token,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           show_date: date,
           venue: venue.trim(),
@@ -132,20 +108,10 @@ export default function Home() {
   async function remove(id: string) {
     setError(null)
 
-    const token = getToken()
-    if (!token) {
-      setError('Falta el Admin token para borrar.')
-      return
-    }
-
     try {
       const res = await fetch(`/api/shows?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
-        headers: {
-          'x-app-token': token,
-        },
       })
-
       const json = await res.json()
 
       if (!res.ok) {
@@ -199,10 +165,6 @@ export default function Home() {
                 <span className="opacity-70">Total {year}:</span>{' '}
                 <span className="text-lg font-bold">{total}</span>
               </div>
-
-              {loading ? (
-                <div className="text-sm opacity-70">Cargando…</div>
-              ) : null}
             </div>
           </div>
         </header>

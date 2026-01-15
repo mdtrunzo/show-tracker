@@ -5,14 +5,6 @@ function yearRange(year: number) {
   return { from: `${year}-01-01`, to: `${year}-12-31` }
 }
 
-function requireToken(req: Request) {
-  const token = req.headers.get('x-app-token')
-  if (!token || token !== process.env.APP_WRITE_TOKEN) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  return null
-}
-
 export async function GET(req: Request) {
   const url = new URL(req.url)
   const year = Number(url.searchParams.get('year') || new Date().getFullYear())
@@ -31,9 +23,6 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const authError = requireToken(req)
-  if (authError) return authError
-
   const { show_date, venue, band } = await req.json()
 
   if (!show_date || !venue?.trim() || !band?.trim()) {
@@ -51,9 +40,6 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const authError = requireToken(req)
-  if (authError) return authError
-
   const url = new URL(req.url)
   const id = url.searchParams.get('id')
 
