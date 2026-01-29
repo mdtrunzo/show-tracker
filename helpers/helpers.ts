@@ -5,5 +5,5 @@ export const yearOf = (dateStr: string) => {
 export const formatLatamDate = (dateStr: string) => {
   const [year, month, day] = dateStr.split('-')
   if (!year || !month || !day) return dateStr
-  return `${day}-${month}-${year}`
+  return `${day}-${month}`
 }
