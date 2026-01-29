@@ -2,16 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import { formatLatamDate, yearOf } from '@/helpers/helpers'
 
 type ShowRow = {
   id: string
   show_date: string
   venue: string
   band: string
-}
-
-function yearOf(dateStr: string) {
-  return new Date(dateStr + 'T00:00:00').getFullYear()
 }
 
 export default function Home() {
@@ -250,7 +247,9 @@ export default function Home() {
                 {rows.map((r, idx) => (
                   <tr key={r.id} className="border-b border-[#2b251b]">
                     <td className="py-2 pr-3 opacity-80">{idx + 1}</td>
-                    <td className="py-2 pr-3">{r.show_date}</td>
+                    <td className="py-2 pr-3">
+                      {formatLatamDate(r.show_date)}
+                    </td>
                     <td className="py-2 pr-3">{r.venue}</td>
                     <td className="py-2 pr-3">{r.band}</td>
                     <td className="py-2 pr-3 text-right">
