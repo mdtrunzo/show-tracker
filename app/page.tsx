@@ -13,7 +13,8 @@ type ShowRow = {
 }
 
 export default function Home() {
-  const [year, setYear] = useState<number>(() => new Date().getFullYear())
+  const [mounted, setMounted] = useState(false)
+  const [year, setYear] = useState<number>(new Date().getFullYear())
   const [date, setDate] = useState<string>('')
   const [venue, setVenue] = useState<string>('')
   const [band, setBand] = useState<string>('')
@@ -22,6 +23,11 @@ export default function Home() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<'shows' | 'stats'>('shows')
+
+  useEffect(() => {
+    setYear(new Date().getFullYear())
+    setMounted(true)
+  }, [])
 
   async function loadShows(selectedYear: number) {
     setLoading(true)
@@ -122,7 +128,7 @@ export default function Home() {
     }
   }
 
-  return loading || saving ? (
+  return !mounted || loading || saving ? (
     <div className="flex items-center justify-center mt-60 gap-2">
       <Image src="/loader2.gif" alt="Loading" width={400} height={400} />
     </div>

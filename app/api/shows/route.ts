@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { getSupabase } from '@/lib/supabaseClient'
 
 function yearRange(year: number) {
   return { from: `${year}-01-01`, to: `${year}-12-31` }
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
   const year = Number(url.searchParams.get('year') || new Date().getFullYear())
   const { from, to } = yearRange(year)
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('shows')
     .select('id, show_date, venue, band, created_at')
     .gte('show_date', from)
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
   }
 
-  const { error } = await supabase.from('shows').insert({
+  const { error } = await getSupabase().from('shows').insert({
     show_date,
     venue: venue.trim(),
     band: band.trim(),
@@ -47,7 +47,7 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: 'Missing id' }, { status: 400 })
   }
 
-  const { error } = await supabase.from('shows').delete().eq('id', id)
+  const { error } = await getSupabase().from('shows').delete().eq('id', id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ ok: true })
