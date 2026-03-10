@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { formatLatamDate, yearOf } from '@/helpers/helpers'
+import Stats from './components/Stats'
 
 type ShowRow = {
   id: string
@@ -12,16 +13,15 @@ type ShowRow = {
 }
 
 export default function Home() {
-  const currentYear = new Date().getFullYear()
-
-  const [year, setYear] = useState<number>(currentYear)
+  const [year, setYear] = useState<number>(() => new Date().getFullYear())
   const [date, setDate] = useState<string>('')
   const [venue, setVenue] = useState<string>('')
   const [band, setBand] = useState<string>('')
   const [rows, setRows] = useState<ShowRow[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [tab, setTab] = useState<'shows' | 'stats'>('shows')
 
   async function loadShows(selectedYear: number) {
     setLoading(true)
@@ -39,8 +39,8 @@ export default function Home() {
       } else {
         setRows(json.data || [])
       }
-    } catch (err: any) {
-      setError(err?.message || 'Error inesperado')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error inesperado')
       setRows([])
     } finally {
       setLoading(false)
@@ -55,9 +55,9 @@ export default function Home() {
 
   const yearOptions = useMemo(() => {
     const start = 2020
-    const end = currentYear + 1
+    const end = year + 1
     return Array.from({ length: end - start + 1 }, (_, i) => start + i)
-  }, [currentYear])
+  }, [year])
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -95,8 +95,8 @@ export default function Home() {
       const insertedYear = yearOf(date)
       if (insertedYear !== year) setYear(insertedYear)
       else await loadShows(year)
-    } catch (err: any) {
-      setError(err?.message || 'Error inesperado')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error inesperado')
     } finally {
       setSaving(false)
     }
@@ -117,8 +117,8 @@ export default function Home() {
       }
 
       await loadShows(year)
-    } catch (err: any) {
-      setError(err?.message || 'Error inesperado')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error inesperado')
     }
   }
 
@@ -164,8 +164,35 @@ export default function Home() {
               </div>
             </div>
           </div>
+          {/* Tab buttons */}
+          <div className="mt-5 flex gap-2">
+            <button
+              onClick={() => setTab('shows')}
+              className={`rounded-lg border border-[#d6cbb6] px-4 py-2 text-sm tracking-wide cursor-pointer transition-colors ${
+                tab === 'shows'
+                  ? 'bg-[#e7dcc7] font-bold'
+                  : 'bg-[#fbf7ee] opacity-70 hover:opacity-100'
+              }`}
+            >
+              Shows
+            </button>
+            <button
+              onClick={() => setTab('stats')}
+              className={`rounded-lg border border-[#d6cbb6] px-4 py-2 text-sm tracking-wide cursor-pointer transition-colors ${
+                tab === 'stats'
+                  ? 'bg-[#e7dcc7] font-bold'
+                  : 'bg-[#fbf7ee] opacity-70 hover:opacity-100'
+              }`}
+            >
+              Estadísticas
+            </button>
+          </div>
         </header>
 
+        {tab === 'stats' ? (
+          <Stats rows={rows} year={year} />
+        ) : (
+        <>
         <section className="mb-8 rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
           <h2 className="text-lg tracking-wide">Agregar show</h2>
 
@@ -266,6 +293,9 @@ export default function Home() {
             </table>
           </div>
         </section>
+
+        </>
+        )}
 
         <footer className="mt-8 text-xs opacity-60">
           Hecho por{' '}
