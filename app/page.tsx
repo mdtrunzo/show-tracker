@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { formatLatamDate, yearOf } from '@/helpers/helpers'
+import { formatLatamDate, yearOf, COUNTRIES } from '@/helpers/helpers'
 import Stats from './components/Stats'
 
 type ShowRow = {
@@ -10,6 +10,12 @@ type ShowRow = {
   show_date: string
   venue: string
   band: string
+  country: string | null
+}
+
+function countryFlag(code: string | null): string {
+  if (!code) return '🇦🇷'
+  return COUNTRIES.find((c) => c.code === code)?.flag ?? '🏳️'
 }
 
 export default function Home() {
@@ -19,6 +25,7 @@ export default function Home() {
   const [venue, setVenue] = useState<string>('')
   const [band, setBand] = useState<string>('')
   const [customBand, setCustomBand] = useState<string>('')
+  const [country, setCountry] = useState<string>('AR')
   const [rows, setRows] = useState<ShowRow[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -86,6 +93,7 @@ export default function Home() {
           show_date: date,
           venue: venue.trim(),
           band: finalBand,
+          country,
         }),
       })
 
@@ -100,6 +108,7 @@ export default function Home() {
       setVenue('')
       setBand('')
       setCustomBand('')
+      setCountry('AR')
 
       const insertedYear = yearOf(date)
       if (insertedYear !== year) setYear(insertedYear)
@@ -205,7 +214,7 @@ export default function Home() {
         <section className="mb-8 rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
           <h2 className="text-lg tracking-wide">Agregar show</h2>
 
-          <form onSubmit={onSubmit} className="mt-4 grid gap-3 md:grid-cols-4 overflow-hidden">
+          <form onSubmit={onSubmit} className="mt-4 grid gap-3 md:grid-cols-5 overflow-hidden">
             <div className="md:col-span-1 min-w-0">
               <label className="block text-xs opacity-70 mb-1">Fecha</label>
               <input
@@ -224,6 +233,21 @@ export default function Home() {
                 placeholder="Niceto, Uniclub, etc"
                 className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
               />
+            </div>
+
+            <div className="md:col-span-1">
+              <label className="block text-xs opacity-70 mb-1">País</label>
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+              >
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.flag} {c.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="md:col-span-1">
@@ -303,7 +327,7 @@ export default function Home() {
                     <td className="py-2 pr-3">
                       {formatLatamDate(r.show_date)}
                     </td>
-                    <td className="py-2 pr-3">{r.venue}</td>
+                    <td className="py-2 pr-3">{r.venue} {countryFlag(r.country)} </td>
                     <td className="py-2 pr-3">{r.band === 'Supervos' ? 'SuperVos' : r.band}</td>
                     <td className="py-2 pr-3 text-right">
                       <button

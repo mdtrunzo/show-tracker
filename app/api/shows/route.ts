@@ -12,7 +12,7 @@ export async function GET(req: Request) {
 
   const { data, error } = await getSupabase()
     .from('shows')
-    .select('id, show_date, venue, band, created_at')
+    .select('id, show_date, venue, band, country, created_at')
     .gte('show_date', from)
     .lte('show_date', to)
     .order('show_date', { ascending: true })
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { show_date, venue, band } = await req.json()
+  const { show_date, venue, band, country } = await req.json()
 
   if (!show_date || !venue?.trim() || !band?.trim()) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
@@ -33,6 +33,7 @@ export async function POST(req: Request) {
     show_date,
     venue: venue.trim(),
     band: band.trim(),
+    country: country || null,
   })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
