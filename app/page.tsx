@@ -14,10 +14,11 @@ type ShowRow = {
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
-  const [year, setYear] = useState<number>(new Date().getFullYear())
+  const [year, setYear] = useState<number>(0)
   const [date, setDate] = useState<string>('')
   const [venue, setVenue] = useState<string>('')
   const [band, setBand] = useState<string>('')
+  const [customBand, setCustomBand] = useState<string>('')
   const [rows, setRows] = useState<ShowRow[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -54,7 +55,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    loadShows(year)
+    if (year > 0) loadShows(year)
   }, [year])
 
   const total = rows.length
@@ -69,7 +70,8 @@ export default function Home() {
     e.preventDefault()
     setError(null)
 
-    if (!date || !venue.trim() || !band.trim()) {
+    const finalBand = band === 'Otra' ? customBand.trim() : band
+    if (!date || !venue.trim() || !finalBand) {
       setError('Te falta completar algo (fecha / lugar / banda).')
       return
     }
@@ -83,7 +85,7 @@ export default function Home() {
         body: JSON.stringify({
           show_date: date,
           venue: venue.trim(),
-          band: band.trim(),
+          band: finalBand,
         }),
       })
 
@@ -97,6 +99,7 @@ export default function Home() {
       setDate('')
       setVenue('')
       setBand('')
+      setCustomBand('')
 
       const insertedYear = yearOf(date)
       if (insertedYear !== year) setYear(insertedYear)
@@ -129,7 +132,7 @@ export default function Home() {
   }
 
   return !mounted || loading || saving ? (
-    <div className="flex items-center justify-center mt-60 gap-2">
+    <div className="flex items-center justify-center mt-60 gap-2" suppressHydrationWarning>
       <Image src="/loader2.gif" alt="Loading" width={400} height={400} />
     </div>
   ) : (
@@ -202,14 +205,14 @@ export default function Home() {
         <section className="mb-8 rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
           <h2 className="text-lg tracking-wide">Agregar show</h2>
 
-          <form onSubmit={onSubmit} className="mt-4 grid gap-3 md:grid-cols-4">
+          <form onSubmit={onSubmit} className="mt-4 grid gap-3 md:grid-cols-4 overflow-hidden">
             <div className="md:col-span-1 min-w-0">
               <label className="block text-xs opacity-70 mb-1">Fecha</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="block w-full min-w-0 rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                className="block w-full min-w-0 max-w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
               />
             </div>
 
@@ -225,12 +228,29 @@ export default function Home() {
 
             <div className="md:col-span-1">
               <label className="block text-xs opacity-70 mb-1">Banda</label>
-              <input
+              <select
                 value={band}
-                onChange={(e) => setBand(e.target.value)}
-                placeholder="SuperVos…"
+                onChange={(e) => {
+                  setBand(e.target.value)
+                  if (e.target.value !== 'Otra') setCustomBand('')
+                }}
                 className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
-              />
+              >
+                <option value="">Seleccionar…</option>
+                <option value="SuperVos">SuperVos</option>
+                <option value="Revolvers">Revolvers</option>
+                <option value="Diego Souto">Diego Souto</option>
+                <option value="Abril Sosa">Abril Sosa</option>
+                <option value="Otra">Otra</option>
+              </select>
+              {band === 'Otra' && (
+                <input
+                  value={customBand}
+                  onChange={(e) => setCustomBand(e.target.value)}
+                  placeholder="Nombre de la banda…"
+                  className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm mt-2"
+                />
+              )}
             </div>
 
             <div className="md:col-span-1 flex items-end">
@@ -284,7 +304,7 @@ export default function Home() {
                       {formatLatamDate(r.show_date)}
                     </td>
                     <td className="py-2 pr-3">{r.venue}</td>
-                    <td className="py-2 pr-3">{r.band}</td>
+                    <td className="py-2 pr-3">{r.band === 'Supervos' ? 'SuperVos' : r.band}</td>
                     <td className="py-2 pr-3 text-right">
                       <button
                         onClick={() => remove(r.id)}

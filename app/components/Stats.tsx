@@ -26,17 +26,25 @@ const MONTH_NAMES = [
 ]
 
 export default function Stats({ rows, year }: { rows: ShowRow[]; year: number }) {
+  const monthsToShow = useMemo(() => {
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    if (year < currentYear) return 12
+    if (year === currentYear) return now.getMonth() + 1
+    return 0
+  }, [year])
+
   const monthlyData = useMemo(() => {
     const counts = new Array(12).fill(0)
     rows.forEach((r) => {
       const month = new Date(r.show_date + 'T00:00:00').getMonth()
       counts[month]++
     })
-    return MONTH_NAMES.map((name, i) => ({
+    return MONTH_NAMES.slice(0, monthsToShow).map((name, i) => ({
       mes: name,
       shows: counts[i],
     }))
-  }, [rows])
+  }, [rows, monthsToShow])
 
   const cumulativeData = useMemo(() => {
     let acc = 0
@@ -59,7 +67,8 @@ export default function Stats({ rows, year }: { rows: ShowRow[]; year: number })
   const topBands = useMemo(() => {
     const map: Record<string, number> = {}
     rows.forEach((r) => {
-      map[r.band] = (map[r.band] || 0) + 1
+      const name = r.band === 'Supervos' ? 'SuperVos' : r.band
+      map[name] = (map[name] || 0) + 1
     })
     return Object.entries(map)
       .sort((a, b) => b[1] - a[1])
@@ -80,7 +89,7 @@ export default function Stats({ rows, year }: { rows: ShowRow[]; year: number })
   }, [rows, year])
 
   const uniqueVenues = useMemo(() => new Set(rows.map((r) => r.venue)).size, [rows])
-  const uniqueBands = useMemo(() => new Set(rows.map((r) => r.band)).size, [rows])
+  const uniqueBands = useMemo(() => new Set(rows.map((r) => r.band === 'Supervos' ? 'SuperVos' : r.band)).size, [rows])
 
   if (rows.length === 0) {
     return (
