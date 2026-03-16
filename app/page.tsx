@@ -45,6 +45,7 @@ export default function Home() {
   const [newBandName, setNewBandName] = useState('')
   const [savingBand, setSavingBand] = useState(false)
   const [bandError, setBandError] = useState<string | null>(null)
+  const [deleteModal, setDeleteModal] = useState<{ type: 'show' | 'band'; id: string; name: string } | null>(null)
 
   async function loadBands() {
     try {
@@ -149,23 +150,31 @@ export default function Home() {
     }
   }
 
-  async function remove(id: string) {
-    setError(null)
+  async function confirmDelete() {
+    if (!deleteModal) return
+    const { type, id } = deleteModal
+    setDeleteModal(null)
 
-    try {
-      const res = await fetch(`/api/shows?id=${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-      })
-      const json = await res.json()
-
-      if (!res.ok) {
-        setError(json.error || 'Error borrando el show')
-        return
+    if (type === 'show') {
+      setError(null)
+      try {
+        const res = await fetch(`/api/shows?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+        const json = await res.json()
+        if (!res.ok) { setError(json.error || 'Error borrando el show'); return }
+        await loadShows(year)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error inesperado')
       }
-
-      await loadShows(year)
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error inesperado')
+    } else {
+      setBandError(null)
+      try {
+        const res = await fetch(`/api/bands?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+        const json = await res.json()
+        if (!res.ok) { setBandError(json.error || 'Error borrando la banda'); return }
+        await loadBands()
+      } catch (err: unknown) {
+        setBandError(err instanceof Error ? err.message : 'Error inesperado')
+      }
     }
   }
 
@@ -335,25 +344,11 @@ export default function Home() {
                   >
                     <span className="text-sm">{b.name}</span>
                     <button
-                      onClick={async () => {
-                        setBandError(null)
-                        try {
-                          const res = await fetch(`/api/bands?id=${encodeURIComponent(b.id)}`, {
-                            method: 'DELETE',
-                          })
-                          const json = await res.json()
-                          if (!res.ok) {
-                            setBandError(json.error || 'Error borrando la banda')
-                            return
-                          }
-                          await loadBands()
-                        } catch (err: unknown) {
-                          setBandError(err instanceof Error ? err.message : 'Error inesperado')
-                        }
-                      }}
-                      className="rounded-md border cursor-pointer border-[#d6cbb6] px-2 py-1 text-xs opacity-80 hover:opacity-100"
+                      onClick={() => setDeleteModal({ type: 'band', id: b.id, name: b.name })}
+                      className="rounded-md border cursor-pointer border-[#d6cbb6] p-1.5 opacity-60 hover:opacity-100 hover:border-[#f65f4e] hover:text-[#f65f4e] transition-all"
+                      title="Borrar banda"
                     >
-                      Borrar
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                     </button>
                   </div>
                 ))}
@@ -503,10 +498,11 @@ export default function Home() {
                         </td>
                         <td className="py-2 pr-3 text-right">
                           <button
-                            onClick={() => remove(r.id)}
-                            className="rounded-md border cursor-pointer border-[#d6cbb6] px-2 py-1 text-xs opacity-80 hover:opacity-100"
+                            onClick={() => setDeleteModal({ type: 'show', id: r.id, name: `${r.band} - ${r.venue}` })}
+                            className="rounded-md border cursor-pointer border-[#d6cbb6] p-1.5 opacity-60 hover:opacity-100 hover:border-[#f65f4e] hover:text-[#f65f4e] transition-all"
+                            title="Borrar show"
                           >
-                            Borrar
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                           </button>
                         </td>
                       </tr>
@@ -516,6 +512,31 @@ export default function Home() {
               </div>
             </section>
           </>
+        )}
+
+        {deleteModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-6 shadow-lg max-w-sm w-full mx-4 font-vintage">
+              <h3 className="text-lg tracking-wide mb-2">Confirmar eliminación</h3>
+              <p className="text-sm opacity-80 mb-5">
+                ¿Estás seguro de que querés borrar <span className="font-bold">{deleteModal.name}</span>?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setDeleteModal(null)}
+                  className="rounded-lg border cursor-pointer border-[#d6cbb6] bg-[#fbf7ee] px-4 py-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="rounded-lg border cursor-pointer border-[#f65f4e] bg-[#f65f4e] text-white px-4 py-2 text-sm hover:bg-[#e04d3d] transition-colors"
+                >
+                  Borrar
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         <footer className="mt-8 text-xs opacity-60">
