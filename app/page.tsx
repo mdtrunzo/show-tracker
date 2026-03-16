@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { formatLatamDate, yearOf, COUNTRIES } from '@/helpers/helpers'
+import { createClient } from '@/lib/supabase/browser'
 import Stats from './components/Stats'
 
 type ShowRow = {
@@ -19,8 +21,11 @@ function countryFlag(code: string | null): string {
 }
 
 export default function Home() {
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [year, setYear] = useState<number>(0)
+  const [userName, setUserName] = useState<string | null>(null)
+  const [avatar, setAvatar] = useState<string | null>(null)
   const [date, setDate] = useState<string>('')
   const [venue, setVenue] = useState<string>('')
   const [band, setBand] = useState<string>('')
@@ -35,6 +40,12 @@ export default function Home() {
   useEffect(() => {
     setYear(new Date().getFullYear())
     setMounted(true)
+    createClient()
+      .auth.getUser()
+      .then(({ data: { user } }) => {
+        setUserName(user?.user_metadata?.full_name ?? user?.email ?? null)
+        setAvatar(user?.user_metadata?.picture ?? null)
+      })
   }, [])
 
   async function loadShows(selectedYear: number) {
@@ -141,7 +152,10 @@ export default function Home() {
   }
 
   return !mounted || loading || saving ? (
-    <div className="flex items-center justify-center mt-60 gap-2" suppressHydrationWarning>
+    <div
+      className="flex items-center justify-center mt-60 gap-2"
+      suppressHydrationWarning
+    >
       <Image src="/loader2.gif" alt="Loading" width={400} height={400} />
     </div>
   ) : (
@@ -153,12 +167,32 @@ export default function Home() {
               <h1 className="text-3xl md:text-4xl tracking-wide">
                 Show Tracking
               </h1>
-              <p className="mt-2 text-sm opacity-80">
-                Trackeá tus shows por año.
-              </p>
+              <div className="flex items-center gap-2">
+                {avatar && (
+                  <Image
+                    src={avatar}
+                    alt="Avatar"
+                    width={32}
+                    height={32}
+                    className="rounded-full mt-2"
+                  />
+                )}
+                {userName && (
+                  <p className="mt-2 text-sm opacity-80">{userName}</p>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-3">
+              <button
+                onClick={async () => {
+                  await createClient().auth.signOut()
+                  router.push('/login')
+                }}
+                className="rounded-lg border border-[#d6cbb6] bg-[#fbf7ee] px-3 py-2 text-xs opacity-70 hover:opacity-100 cursor-pointer transition-opacity"
+              >
+                Logout
+              </button>
               <label className="text-sm opacity-80">Año</label>
               <select
                 className="rounded-lg border border-[#d6cbb6] bg-[#fbf7ee] px-3 py-2 text-sm"
@@ -210,141 +244,149 @@ export default function Home() {
         {tab === 'stats' ? (
           <Stats rows={rows} year={year} />
         ) : (
-        <>
-        <section className="mb-8 rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-          <h2 className="text-lg tracking-wide">Agregar show</h2>
+          <>
+            <section className="mb-8 rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
+              <h2 className="text-lg tracking-wide">Agregar show</h2>
 
-          <form onSubmit={onSubmit} className="mt-4 grid gap-3 md:grid-cols-5 overflow-hidden">
-            <div className="md:col-span-1 min-w-0">
-              <label className="block text-xs opacity-70 mb-1">Fecha</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="block w-full min-w-0 max-w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
-              />
-            </div>
-
-            <div className="md:col-span-1">
-              <label className="block text-xs opacity-70 mb-1">Lugar</label>
-              <input
-                value={venue}
-                onChange={(e) => setVenue(e.target.value)}
-                placeholder="Niceto, Uniclub, etc"
-                className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
-              />
-            </div>
-
-            <div className="md:col-span-1">
-              <label className="block text-xs opacity-70 mb-1">País</label>
-              <select
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+              <form
+                onSubmit={onSubmit}
+                className="mt-4 grid gap-3 md:grid-cols-5 overflow-hidden"
               >
-                {COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.flag} {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <div className="md:col-span-1 min-w-0">
+                  <label className="block text-xs opacity-70 mb-1">Fecha</label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="block w-full min-w-0 max-w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                  />
+                </div>
 
-            <div className="md:col-span-1">
-              <label className="block text-xs opacity-70 mb-1">Banda</label>
-              <select
-                value={band}
-                onChange={(e) => {
-                  setBand(e.target.value)
-                  if (e.target.value !== 'Otra') setCustomBand('')
-                }}
-                className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
-              >
-                <option value="">Seleccionar…</option>
-                <option value="SuperVos">SuperVos</option>
-                <option value="Revolvers">Revolvers</option>
-                <option value="Diego Souto">Diego Souto</option>
-                <option value="Abril Sosa">Abril Sosa</option>
-                <option value="Otra">Otra</option>
-              </select>
-              {band === 'Otra' && (
-                <input
-                  value={customBand}
-                  onChange={(e) => setCustomBand(e.target.value)}
-                  placeholder="Nombre de la banda…"
-                  className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm mt-2"
-                />
-              )}
-            </div>
+                <div className="md:col-span-1">
+                  <label className="block text-xs opacity-70 mb-1">Lugar</label>
+                  <input
+                    value={venue}
+                    onChange={(e) => setVenue(e.target.value)}
+                    placeholder="Niceto, Uniclub, etc"
+                    className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                  />
+                </div>
 
-            <div className="md:col-span-1 flex items-end">
-              <button
-                type="submit"
-                disabled={saving}
-                className="w-full rounded-lg border cursor-pointer border-[#d6cbb6] bg-[#e7dcc7] px-4 py-2 text-sm tracking-wide hover:bg-[#dacdae] disabled:opacity-60"
-              >
-                {saving ? 'Guardando…' : 'Guardar'}
-              </button>
-            </div>
-          </form>
+                <div className="md:col-span-1">
+                  <label className="block text-xs opacity-70 mb-1">País</label>
+                  <select
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                  >
+                    {COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-          {error ? (
-            <p className="mt-3 text-sm text-[#f65f4e] opacity-95">{error}</p>
-          ) : null}
-        </section>
+                <div className="md:col-span-1">
+                  <label className="block text-xs opacity-70 mb-1">Banda</label>
+                  <select
+                    value={band}
+                    onChange={(e) => {
+                      setBand(e.target.value)
+                      if (e.target.value !== 'Otra') setCustomBand('')
+                    }}
+                    className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                  >
+                    <option value="">Seleccionar…</option>
+                    <option value="SuperVos">SuperVos</option>
+                    <option value="Revolvers">Revolvers</option>
+                    <option value="Diego Souto">Diego Souto</option>
+                    <option value="Abril Sosa">Abril Sosa</option>
+                    <option value="Otra">Otra</option>
+                  </select>
+                  {band === 'Otra' && (
+                    <input
+                      value={customBand}
+                      onChange={(e) => setCustomBand(e.target.value)}
+                      placeholder="Nombre de la banda…"
+                      className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm mt-2"
+                    />
+                  )}
+                </div>
 
-        <section className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-          <div className="flex items-baseline justify-between gap-4 flex-wrap">
-            <h2 className="text-lg tracking-wide">Shows {year}</h2>
-            <p className="text-xs opacity-70">
-              El # se calcula por orden de fecha dentro del año.
-            </p>
-          </div>
+                <div className="md:col-span-1 flex items-end">
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="w-full rounded-lg border cursor-pointer border-[#d6cbb6] bg-[#e7dcc7] px-4 py-2 text-sm tracking-wide hover:bg-[#dacdae] disabled:opacity-60"
+                  >
+                    {saving ? 'Guardando…' : 'Guardar'}
+                  </button>
+                </div>
+              </form>
 
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead className="text-left">
-                <tr className="border-b border-[#d6cbb6] opacity-80">
-                  <th className="py-2 pr-3 w-14">#</th>
-                  <th className="py-2 pr-3 w-40">Fecha</th>
-                  <th className="py-2 pr-3">Lugar</th>
-                  <th className="py-2 pr-3">Banda</th>
-                  <th className="py-2 pr-3 w-24"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.length === 0 && !loading ? (
-                  <tr>
-                    <td className="py-4 opacity-70" colSpan={5}>
-                      No hay shows cargados para {year}.
-                    </td>
-                  </tr>
-                ) : null}
+              {error ? (
+                <p className="mt-3 text-sm text-[#f65f4e] opacity-95">
+                  {error}
+                </p>
+              ) : null}
+            </section>
 
-                {rows.map((r, idx) => (
-                  <tr key={r.id} className="border-b border-[#2b251b]">
-                    <td className="py-2 pr-3 opacity-80">{idx + 1}</td>
-                    <td className="py-2 pr-3">
-                      {formatLatamDate(r.show_date)}
-                    </td>
-                    <td className="py-2 pr-3">{r.venue} {countryFlag(r.country)} </td>
-                    <td className="py-2 pr-3">{r.band === 'Supervos' ? 'SuperVos' : r.band}</td>
-                    <td className="py-2 pr-3 text-right">
-                      <button
-                        onClick={() => remove(r.id)}
-                        className="rounded-md border cursor-pointer border-[#d6cbb6] px-2 py-1 text-xs opacity-80 hover:opacity-100"
-                      >
-                        Borrar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+            <section className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
+              <div className="flex items-baseline justify-between gap-4 flex-wrap">
+                <h2 className="text-lg tracking-wide">Shows {year}</h2>
+                <p className="text-xs opacity-70">
+                  El # se calcula por orden de fecha dentro del año.
+                </p>
+              </div>
 
-        </>
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full border-collapse text-sm">
+                  <thead className="text-left">
+                    <tr className="border-b border-[#d6cbb6] opacity-80">
+                      <th className="py-2 pr-3 w-14">#</th>
+                      <th className="py-2 pr-3 w-40">Fecha</th>
+                      <th className="py-2 pr-3">Lugar</th>
+                      <th className="py-2 pr-3">Banda</th>
+                      <th className="py-2 pr-3 w-24"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.length === 0 && !loading ? (
+                      <tr>
+                        <td className="py-4 opacity-70" colSpan={5}>
+                          No hay shows cargados para {year}.
+                        </td>
+                      </tr>
+                    ) : null}
+
+                    {rows.map((r, idx) => (
+                      <tr key={r.id} className="border-b border-[#2b251b]">
+                        <td className="py-2 pr-3 opacity-80">{idx + 1}</td>
+                        <td className="py-2 pr-3">
+                          {formatLatamDate(r.show_date)}
+                        </td>
+                        <td className="py-2 pr-3">
+                          {r.venue} {countryFlag(r.country)}{' '}
+                        </td>
+                        <td className="py-2 pr-3">
+                          {r.band === 'Supervos' ? 'SuperVos' : r.band}
+                        </td>
+                        <td className="py-2 pr-3 text-right">
+                          <button
+                            onClick={() => remove(r.id)}
+                            className="rounded-md border cursor-pointer border-[#d6cbb6] px-2 py-1 text-xs opacity-80 hover:opacity-100"
+                          >
+                            Borrar
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </>
         )}
 
         <footer className="mt-8 text-xs opacity-60">
