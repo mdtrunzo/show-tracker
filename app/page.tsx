@@ -15,6 +15,11 @@ type ShowRow = {
   country: string | null
 }
 
+type UserBand = {
+  id: string
+  name: string
+}
+
 function countryFlag(code: string | null): string {
   if (!code) return '🇦🇷'
   return COUNTRIES.find((c) => c.code === code)?.flag ?? '🏳️'
@@ -35,7 +40,19 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [tab, setTab] = useState<'shows' | 'stats'>('shows')
+  const [tab, setTab] = useState<'shows' | 'stats' | 'bands'>('shows')
+  const [userBands, setUserBands] = useState<UserBand[]>([])
+  const [newBandName, setNewBandName] = useState('')
+  const [savingBand, setSavingBand] = useState(false)
+  const [bandError, setBandError] = useState<string | null>(null)
+
+  async function loadBands() {
+    try {
+      const res = await fetch('/api/bands', { cache: 'no-store' })
+      const json = await res.json()
+      if (res.ok) setUserBands(json.data || [])
+    } catch {}
+  }
 
   useEffect(() => {
     setYear(new Date().getFullYear())
@@ -46,6 +63,7 @@ export default function Home() {
         setUserName(user?.user_metadata?.full_name ?? user?.email ?? null)
         setAvatar(user?.user_metadata?.picture ?? null)
       })
+    loadBands()
   }, [])
 
   async function loadShows(selectedYear: number) {
@@ -88,7 +106,7 @@ export default function Home() {
     e.preventDefault()
     setError(null)
 
-    const finalBand = band === 'Otra' ? customBand.trim() : band
+    const finalBand = userBands.length > 0 && band === 'Otra' ? customBand.trim() : band.trim()
     if (!date || !venue.trim() || !finalBand) {
       setError('Te falta completar algo (fecha / lugar / banda).')
       return
@@ -238,11 +256,110 @@ export default function Home() {
             >
               Estadísticas
             </button>
+            <button
+              onClick={() => setTab('bands')}
+              className={`rounded-lg border border-[#d6cbb6] px-4 py-2 text-sm tracking-wide cursor-pointer transition-colors ${
+                tab === 'bands'
+                  ? 'bg-[#e7dcc7] font-bold'
+                  : 'bg-[#fbf7ee] opacity-70 hover:opacity-100'
+              }`}
+            >
+              Agregá tus bandas
+            </button>
           </div>
         </header>
 
         {tab === 'stats' ? (
           <Stats rows={rows} year={year} />
+        ) : tab === 'bands' ? (
+          <section className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
+            <h2 className="text-lg tracking-wide mb-4">Tus bandas</h2>
+            <p className="text-sm opacity-70 mb-4">
+              Agregá los nombres de tus bandas para verlas en el selector.
+            </p>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault()
+                setBandError(null)
+                if (!newBandName.trim()) return
+                setSavingBand(true)
+                try {
+                  const res = await fetch('/api/bands', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newBandName.trim() }),
+                  })
+                  const json = await res.json()
+                  if (!res.ok) {
+                    setBandError(json.error || 'Error guardando la banda')
+                    return
+                  }
+                  setNewBandName('')
+                  await loadBands()
+                } catch (err: unknown) {
+                  setBandError(err instanceof Error ? err.message : 'Error inesperado')
+                } finally {
+                  setSavingBand(false)
+                }
+              }}
+              className="flex gap-2 mb-5"
+            >
+              <input
+                value={newBandName}
+                onChange={(e) => setNewBandName(e.target.value)}
+                placeholder="Nombre de la banda…"
+                className="flex-1 rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+              />
+              <button
+                type="submit"
+                disabled={savingBand}
+                className="rounded-lg border cursor-pointer border-[#d6cbb6] bg-[#e7dcc7] px-4 py-2 text-sm tracking-wide hover:bg-[#dacdae] disabled:opacity-60"
+              >
+                {savingBand ? 'Guardando…' : 'Agregar'}
+              </button>
+            </form>
+
+            {bandError && (
+              <p className="mb-3 text-sm text-[#f65f4e] opacity-95">{bandError}</p>
+            )}
+
+            {userBands.length === 0 ? (
+              <p className="text-sm opacity-60">No tenés bandas guardadas todavía.</p>
+            ) : (
+              <div className="space-y-2">
+                {userBands.map((b) => (
+                  <div
+                    key={b.id}
+                    className="flex items-center justify-between rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2"
+                  >
+                    <span className="text-sm">{b.name}</span>
+                    <button
+                      onClick={async () => {
+                        setBandError(null)
+                        try {
+                          const res = await fetch(`/api/bands?id=${encodeURIComponent(b.id)}`, {
+                            method: 'DELETE',
+                          })
+                          const json = await res.json()
+                          if (!res.ok) {
+                            setBandError(json.error || 'Error borrando la banda')
+                            return
+                          }
+                          await loadBands()
+                        } catch (err: unknown) {
+                          setBandError(err instanceof Error ? err.message : 'Error inesperado')
+                        }
+                      }}
+                      className="rounded-md border cursor-pointer border-[#d6cbb6] px-2 py-1 text-xs opacity-80 hover:opacity-100"
+                    >
+                      Borrar
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         ) : (
           <>
             <section className="mb-8 rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
@@ -289,27 +406,39 @@ export default function Home() {
 
                 <div className="md:col-span-1">
                   <label className="block text-xs opacity-70 mb-1">Banda</label>
-                  <select
-                    value={band}
-                    onChange={(e) => {
-                      setBand(e.target.value)
-                      if (e.target.value !== 'Otra') setCustomBand('')
-                    }}
-                    className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
-                  >
-                    <option value="">Seleccionar…</option>
-                    <option value="SuperVos">SuperVos</option>
-                    <option value="Revolvers">Revolvers</option>
-                    <option value="Diego Souto">Diego Souto</option>
-                    <option value="Abril Sosa">Abril Sosa</option>
-                    <option value="Otra">Otra</option>
-                  </select>
-                  {band === 'Otra' && (
+                  {userBands.length > 0 ? (
+                    <>
+                      <select
+                        value={band}
+                        onChange={(e) => {
+                          setBand(e.target.value)
+                          if (e.target.value !== 'Otra') setCustomBand('')
+                        }}
+                        className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                      >
+                        <option value="">Seleccionar…</option>
+                        {userBands.map((b) => (
+                          <option key={b.id} value={b.name}>
+                            {b.name}
+                          </option>
+                        ))}
+                        <option value="Otra">Otra</option>
+                      </select>
+                      {band === 'Otra' && (
+                        <input
+                          value={customBand}
+                          onChange={(e) => setCustomBand(e.target.value)}
+                          placeholder="Nombre de la banda…"
+                          className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm mt-2"
+                        />
+                      )}
+                    </>
+                  ) : (
                     <input
-                      value={customBand}
-                      onChange={(e) => setCustomBand(e.target.value)}
+                      value={band}
+                      onChange={(e) => setBand(e.target.value)}
                       placeholder="Nombre de la banda…"
-                      className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm mt-2"
+                      className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
                     />
                   )}
                 </div>
@@ -370,7 +499,7 @@ export default function Home() {
                           {r.venue} {countryFlag(r.country)}{' '}
                         </td>
                         <td className="py-2 pr-3">
-                          {r.band === 'Supervos' ? 'SuperVos' : r.band}
+                          {r.band}
                         </td>
                         <td className="py-2 pr-3 text-right">
                           <button
