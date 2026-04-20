@@ -85,7 +85,7 @@ export default function Stats({ rows, year }: { rows: ShowRow[]; year: number })
     const currentYear = now.getFullYear()
     const monthsElapsed = year < currentYear ? 12 : (year === currentYear ? now.getMonth() + 1 : 0)
     if (monthsElapsed === 0) return 0
-    return (rows.length / monthsElapsed).toFixed(1)
+    return Math.round(rows.length / monthsElapsed)
   }, [rows, year])
 
   const uniqueVenues = useMemo(() => new Set(rows.map((r) => r.venue)).size, [rows])
