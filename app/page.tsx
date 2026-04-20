@@ -379,7 +379,7 @@ export default function Home() {
                   <input
                     value={venue}
                     onChange={(e) => setVenue(e.target.value)}
-                    placeholder="Niceto, Uniclub, etc"
+                    placeholder="Niceto, Sullivans, etc"
                     className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
                   />
                 </div>
