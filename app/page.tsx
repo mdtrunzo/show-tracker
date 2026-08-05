@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { formatLatamDate, yearOf, COUNTRIES } from '@/helpers/helpers'
+import { formatLatamDate, yearOf, COUNTRIES, MONTHS } from '@/helpers/helpers'
 import { createClient } from '@/lib/supabase/browser'
 import Stats from './components/Stats'
 
@@ -46,6 +46,10 @@ export default function Home() {
   const [savingBand, setSavingBand] = useState(false)
   const [bandError, setBandError] = useState<string | null>(null)
   const [deleteModal, setDeleteModal] = useState<{ type: 'show' | 'band'; id: string; name: string } | null>(null)
+  const [filterBand, setFilterBand] = useState('')
+  const [filterVenue, setFilterVenue] = useState('')
+  const [filterCountry, setFilterCountry] = useState('')
+  const [filterMonth, setFilterMonth] = useState('')
 
   async function loadBands() {
     try {
@@ -92,10 +96,38 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (year > 0) loadShows(year)
+    if (year > 0) {
+      setFilterBand('')
+      setFilterVenue('')
+      setFilterCountry('')
+      setFilterMonth('')
+      loadShows(year)
+    }
   }, [year])
 
-  const total = rows.length
+  const uniqueBands = useMemo(() => [...new Set(rows.map((r) => r.band))].sort(), [rows])
+  const uniqueVenues = useMemo(() => [...new Set(rows.map((r) => r.venue))].sort(), [rows])
+  const uniqueCountries = useMemo(
+    () => [...new Set(rows.map((r) => r.country).filter(Boolean))] as string[],
+    [rows],
+  )
+  const usedMonths = useMemo(
+    () => [...new Set(rows.map((r) => r.show_date.slice(5, 7)))].sort(),
+    [rows],
+  )
+
+  const filteredRows = useMemo(() => {
+    return rows.filter((r) => {
+      if (filterBand && r.band !== filterBand) return false
+      if (filterVenue && r.venue !== filterVenue) return false
+      if (filterCountry && r.country !== filterCountry) return false
+      if (filterMonth && r.show_date.slice(5, 7) !== filterMonth) return false
+      return true
+    })
+  }, [rows, filterBand, filterVenue, filterCountry, filterMonth])
+
+  const hasActiveFilters = filterBand || filterVenue || filterCountry || filterMonth
+  const total = filteredRows.length
 
   const yearOptions = useMemo(() => {
     const start = 2020
@@ -464,6 +496,84 @@ export default function Home() {
                 </p>
               </div>
 
+              <div className="mt-4 flex flex-wrap items-end gap-3">
+                <div>
+                  <label className="block text-xs opacity-70 mb-1">Banda</label>
+                  <select
+                    value={filterBand}
+                    onChange={(e) => setFilterBand(e.target.value)}
+                    className="rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                  >
+                    <option value="">Todas</option>
+                    {uniqueBands.map((b) => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs opacity-70 mb-1">Lugar</label>
+                  <select
+                    value={filterVenue}
+                    onChange={(e) => setFilterVenue(e.target.value)}
+                    className="rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                  >
+                    <option value="">Todos</option>
+                    {uniqueVenues.map((v) => (
+                      <option key={v} value={v}>{v}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs opacity-70 mb-1">País</label>
+                  <select
+                    value={filterCountry}
+                    onChange={(e) => setFilterCountry(e.target.value)}
+                    className="rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                  >
+                    <option value="">Todos</option>
+                    {uniqueCountries.map((code) => {
+                      const c = COUNTRIES.find((x) => x.code === code)
+                      return (
+                        <option key={code} value={code}>
+                          {c ? `${c.flag} ${c.name}` : code}
+                        </option>
+                      )
+                    })}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs opacity-70 mb-1">Mes</label>
+                  <select
+                    value={filterMonth}
+                    onChange={(e) => setFilterMonth(e.target.value)}
+                    className="rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                  >
+                    <option value="">Todos</option>
+                    {usedMonths.map((m) => {
+                      const mo = MONTHS.find((x) => x.value === m)
+                      return (
+                        <option key={m} value={m}>
+                          {mo ? mo.label : m}
+                        </option>
+                      )
+                    })}
+                  </select>
+                </div>
+                {hasActiveFilters && (
+                  <button
+                    onClick={() => {
+                      setFilterBand('')
+                      setFilterVenue('')
+                      setFilterCountry('')
+                      setFilterMonth('')
+                    }}
+                    className="rounded-lg border border-[#d6cbb6] bg-[#e7dcc7] px-3 py-2 text-xs tracking-wide cursor-pointer hover:bg-[#dacdae] transition-colors"
+                  >
+                    Limpiar filtros
+                  </button>
+                )}
+              </div>
+
               <div className="mt-4 overflow-x-auto">
                 <table className="w-full border-collapse text-sm">
                   <thead className="text-left">
@@ -476,15 +586,17 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.length === 0 && !loading ? (
+                    {filteredRows.length === 0 && !loading ? (
                       <tr>
                         <td className="py-4 opacity-70" colSpan={5}>
-                          No hay shows cargados para {year}.
+                          {hasActiveFilters
+                            ? 'No hay shows que coincidan con los filtros.'
+                            : `No hay shows cargados para ${year}.`}
                         </td>
                       </tr>
                     ) : null}
 
-                    {rows.map((r, idx) => (
+                    {filteredRows.map((r, idx) => (
                       <tr key={r.id} className="border-b border-[#2b251b]">
                         <td className="py-2 pr-3 opacity-80">{idx + 1}</td>
                         <td className="py-2 pr-3">
