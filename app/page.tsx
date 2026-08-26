@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { formatLatamDate, yearOf, COUNTRIES, MONTHS } from '@/helpers/helpers'
 import { createClient } from '@/lib/supabase/browser'
 import Stats from './components/Stats'
+import ThemeToggle from './components/ThemeToggle'
 
 type ShowRow = {
   id: string
@@ -210,9 +211,9 @@ export default function Home() {
     }
   }
 
-  const inputClass = 'w-full rounded-md border border-[#2a2825] bg-[#141312] px-3 py-2.5 text-sm text-[#e5e0d8] placeholder-[#4a4640] focus:outline-none focus:border-[#c9a23c] focus:ring-2 focus:ring-[var(--accent-dim)] transition-colors'
-  const selectClass = 'w-full rounded-md border border-[#2a2825] bg-[#141312] px-3 py-2.5 text-sm text-[#e5e0d8] focus:outline-none focus:border-[#c9a23c] focus:ring-2 focus:ring-[var(--accent-dim)] transition-colors appearance-none'
-  const labelClass = 'block text-[10px] uppercase tracking-widest text-[#4a4640] mb-1.5'
+  const inputClass = 'w-full rounded-md border border-[var(--border-input)] bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text)] placeholder-[var(--text-dim)] focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-dim)] transition-colors'
+  const selectClass = 'w-full rounded-md border border-[var(--border-input)] bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text)] focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-dim)] transition-colors appearance-none'
+  const labelClass = 'block text-[10px] uppercase tracking-widest text-[var(--text-dim)] mb-1.5'
 
   return !mounted || loading || saving ? (
     <div
@@ -222,9 +223,8 @@ export default function Home() {
       <Image src="/loader2.gif" alt="Loading" width={400} height={400} />
     </div>
   ) : (
-    <main className="min-h-screen bg-[#0e0e0d] text-[#e5e0d8]">
+    <main className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <div className="mx-auto max-w-[880px] px-6 py-12">
-        {/* Header */}
         <header className="mb-8">
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
@@ -242,24 +242,25 @@ export default function Home() {
                   />
                 )}
                 {userName && (
-                  <p className="text-[13px] text-[#7d7870]">{userName}</p>
+                  <p className="text-[13px] text-[var(--text-muted)]">{userName}</p>
                 )}
               </div>
             </div>
 
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <button
                 onClick={async () => {
                   await createClient().auth.signOut()
                   router.push('/login')
                 }}
-                className="rounded-md border border-[#2a2825] bg-transparent px-3.5 py-2 text-xs text-[#7d7870] hover:text-[#e5e0d8] hover:border-[#4a4640] cursor-pointer transition-colors"
+                className="rounded-md border border-[var(--border-input)] bg-transparent px-3.5 py-2 text-xs text-[var(--text-muted)] hover:text-[var(--text)] hover:border-[var(--text-dim)] cursor-pointer transition-colors"
               >
                 Logout
               </button>
-              <span className="text-[11px] uppercase tracking-widest text-[#4a4640]">Año</span>
+              <span className="text-[11px] uppercase tracking-widest text-[var(--text-dim)]">Año</span>
               <select
-                className="rounded-md border border-[#2a2825] bg-[#141312] px-3 py-2 text-sm font-mono text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
+                className="rounded-md border border-[var(--border-input)] bg-[var(--bg-input)] px-3 py-2 text-sm font-mono text-[var(--text)] appearance-none focus:outline-none focus:border-[var(--accent)]"
                 value={year}
                 onChange={(e) => setYear(Number(e.target.value))}
               >
@@ -272,20 +273,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Total bar */}
-          <div className="mt-6 rounded-xl border border-[#222120] bg-[#1a1917] px-5 py-4 flex items-center justify-between">
-            <span className="text-[13px] text-[#7d7870]">Total {year}</span>
-            <span className="font-mono text-[28px] font-semibold text-[#c9a23c] leading-none tracking-tight">{total}</span>
+          <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-5 py-4 flex items-center justify-between">
+            <span className="text-[13px] text-[var(--text-muted)]">Total {year}</span>
+            <span className="font-mono text-[28px] font-semibold text-[var(--accent)] leading-none tracking-tight">{total}</span>
           </div>
 
-          {/* Tabs */}
-          <div className="mt-6 flex gap-0.5 bg-[#1a1917] border border-[#222120] rounded-lg p-1 w-fit">
+          <div className="mt-6 flex gap-0.5 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg p-1 w-fit">
             <button
               onClick={() => setTab('shows')}
               className={`rounded-md px-5 py-2 text-[13px] cursor-pointer transition-colors ${
                 tab === 'shows'
-                  ? 'bg-[var(--accent-dim)] text-[#c9a23c] font-medium'
-                  : 'text-[#7d7870] hover:text-[#e5e0d8]'
+                  ? 'bg-[var(--accent-dim)] text-[var(--accent)] font-medium'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
               Shows
@@ -294,8 +293,8 @@ export default function Home() {
               onClick={() => setTab('stats')}
               className={`rounded-md px-5 py-2 text-[13px] cursor-pointer transition-colors ${
                 tab === 'stats'
-                  ? 'bg-[var(--accent-dim)] text-[#c9a23c] font-medium'
-                  : 'text-[#7d7870] hover:text-[#e5e0d8]'
+                  ? 'bg-[var(--accent-dim)] text-[var(--accent)] font-medium'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
               Estadísticas
@@ -304,8 +303,8 @@ export default function Home() {
               onClick={() => setTab('bands')}
               className={`rounded-md px-5 py-2 text-[13px] cursor-pointer transition-colors ${
                 tab === 'bands'
-                  ? 'bg-[var(--accent-dim)] text-[#c9a23c] font-medium'
-                  : 'text-[#7d7870] hover:text-[#e5e0d8]'
+                  ? 'bg-[var(--accent-dim)] text-[var(--accent)] font-medium'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
               Tus bandas
@@ -316,12 +315,12 @@ export default function Home() {
         {tab === 'stats' ? (
           <Stats rows={rows} year={year} />
         ) : tab === 'bands' ? (
-          <section className="rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+          <section className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-6">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-[10px] uppercase tracking-[0.12em] text-[#4a4640]">Tus bandas</span>
-              <div className="flex-1 h-px bg-[#222120]" />
+              <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--text-dim)]">Tus bandas</span>
+              <div className="flex-1 h-px bg-[var(--border)]" />
             </div>
-            <p className="text-[13px] text-[#7d7870] mb-5">
+            <p className="text-[13px] text-[var(--text-muted)] mb-5">
               Agregá los nombres de tus bandas para verlas en el selector.
             </p>
 
@@ -361,29 +360,29 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={savingBand}
-                className="rounded-md bg-[#c9a23c] text-[#0e0e0d] px-5 py-2.5 text-sm font-semibold cursor-pointer hover:brightness-110 disabled:opacity-60 transition-all"
+                className="rounded-md bg-[var(--btn-bg)] text-[var(--btn-text)] border border-[var(--btn-border)] px-5 py-2.5 text-sm font-semibold cursor-pointer hover:bg-[var(--btn-hover)] disabled:opacity-60 transition-all"
               >
                 {savingBand ? 'Guardando…' : 'Agregar'}
               </button>
             </form>
 
             {bandError && (
-              <p className="mb-3 text-sm text-[#bf3b3b]">{bandError}</p>
+              <p className="mb-3 text-sm text-[var(--danger)]">{bandError}</p>
             )}
 
             {userBands.length === 0 ? (
-              <p className="text-sm text-[#4a4640]">No tenés bandas guardadas todavía.</p>
+              <p className="text-sm text-[var(--text-dim)]">No tenés bandas guardadas todavía.</p>
             ) : (
               <div className="space-y-1.5">
                 {userBands.map((b) => (
                   <div
                     key={b.id}
-                    className="group flex items-center justify-between rounded-lg border border-[#222120] bg-[#141312] px-4 py-3"
+                    className="group flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--bg-input)] px-4 py-3"
                   >
                     <span className="text-sm">{b.name}</span>
                     <button
                       onClick={() => setDeleteModal({ type: 'band', id: b.id, name: b.name })}
-                      className="rounded-md border border-transparent p-1.5 text-[#4a4640] opacity-0 group-hover:opacity-100 hover:text-[#bf3b3b] hover:border-[#bf3b3b] hover:bg-[var(--danger-dim)] cursor-pointer transition-all"
+                      className="rounded-md border border-transparent p-1.5 text-[var(--text-dim)] opacity-0 group-hover:opacity-100 hover:text-[var(--danger)] hover:border-[var(--danger)] hover:bg-[var(--danger-dim)] cursor-pointer transition-all"
                       title="Borrar banda"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -395,11 +394,10 @@ export default function Home() {
           </section>
         ) : (
           <>
-            {/* Add show form */}
-            <section className="mb-5 rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+            <section className="mb-5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-6">
               <div className="flex items-center gap-3 mb-5">
-                <span className="text-[10px] uppercase tracking-[0.12em] text-[#4a4640]">Agregar show</span>
-                <div className="flex-1 h-px bg-[#222120]" />
+                <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--text-dim)]">Agregar show</span>
+                <div className="flex-1 h-px bg-[var(--border)]" />
               </div>
 
               <form
@@ -484,7 +482,7 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="w-full rounded-md bg-[#c9a23c] text-[#0e0e0d] px-4 py-2.5 text-sm font-semibold cursor-pointer hover:brightness-110 disabled:opacity-60 transition-all"
+                    className="w-full rounded-md bg-[var(--btn-bg)] text-[var(--btn-text)] border border-[var(--btn-border)] px-4 py-2.5 text-sm font-semibold cursor-pointer hover:bg-[var(--btn-hover)] disabled:opacity-60 transition-all"
                   >
                     {saving ? 'Guardando…' : 'Guardar'}
                   </button>
@@ -492,29 +490,27 @@ export default function Home() {
               </form>
 
               {error ? (
-                <p className="mt-3 text-sm text-[#bf3b3b]">
+                <p className="mt-3 text-sm text-[var(--danger)]">
                   {error}
                 </p>
               ) : null}
             </section>
 
-            {/* Shows table */}
-            <section className="rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+            <section className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-6">
               <div className="flex items-baseline justify-between gap-4 flex-wrap mb-4">
                 <h2 className="text-[15px] font-medium">Shows {year}</h2>
-                <p className="text-[11px] text-[#4a4640] italic">
+                <p className="text-[11px] text-[var(--text-dim)] italic">
                   El # se calcula por orden de fecha dentro del año.
                 </p>
               </div>
 
-              {/* Filters */}
-              <div className="flex flex-wrap items-end gap-3 pb-5 mb-5 border-b border-[#222120]">
+              <div className="flex flex-wrap items-end gap-3 pb-5 mb-5 border-b border-[var(--border)]">
                 <div>
                   <label className={labelClass}>Banda</label>
                   <select
                     value={filterBand}
                     onChange={(e) => setFilterBand(e.target.value)}
-                    className="rounded-md border border-[#2a2825] bg-[#141312] px-2.5 py-2 text-xs text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
+                    className="rounded-md border border-[var(--border-input)] bg-[var(--bg-input)] px-2.5 py-2 text-xs text-[var(--text)] appearance-none focus:outline-none focus:border-[var(--accent)]"
                   >
                     <option value="">Todas</option>
                     {uniqueBands.map((b) => (
@@ -527,7 +523,7 @@ export default function Home() {
                   <select
                     value={filterVenue}
                     onChange={(e) => setFilterVenue(e.target.value)}
-                    className="rounded-md border border-[#2a2825] bg-[#141312] px-2.5 py-2 text-xs text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
+                    className="rounded-md border border-[var(--border-input)] bg-[var(--bg-input)] px-2.5 py-2 text-xs text-[var(--text)] appearance-none focus:outline-none focus:border-[var(--accent)]"
                   >
                     <option value="">Todos</option>
                     {uniqueVenues.map((v) => (
@@ -540,7 +536,7 @@ export default function Home() {
                   <select
                     value={filterCountry}
                     onChange={(e) => setFilterCountry(e.target.value)}
-                    className="rounded-md border border-[#2a2825] bg-[#141312] px-2.5 py-2 text-xs text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
+                    className="rounded-md border border-[var(--border-input)] bg-[var(--bg-input)] px-2.5 py-2 text-xs text-[var(--text)] appearance-none focus:outline-none focus:border-[var(--accent)]"
                   >
                     <option value="">Todos</option>
                     {uniqueCountries.map((code) => {
@@ -558,7 +554,7 @@ export default function Home() {
                   <select
                     value={filterMonth}
                     onChange={(e) => setFilterMonth(e.target.value)}
-                    className="rounded-md border border-[#2a2825] bg-[#141312] px-2.5 py-2 text-xs text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
+                    className="rounded-md border border-[var(--border-input)] bg-[var(--bg-input)] px-2.5 py-2 text-xs text-[var(--text)] appearance-none focus:outline-none focus:border-[var(--accent)]"
                   >
                     <option value="">Todos</option>
                     {usedMonths.map((m) => {
@@ -579,7 +575,7 @@ export default function Home() {
                       setFilterCountry('')
                       setFilterMonth('')
                     }}
-                    className="rounded-md border border-[#2a2825] bg-transparent px-3 py-2 text-[11px] text-[#7d7870] cursor-pointer hover:text-[#c9a23c] hover:border-[#c9a23c] transition-colors"
+                    className="rounded-md border border-[var(--border-input)] bg-transparent px-3 py-2 text-[11px] text-[var(--text-muted)] cursor-pointer hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors"
                   >
                     Limpiar filtros
                   </button>
@@ -589,18 +585,18 @@ export default function Home() {
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-sm">
                   <thead className="text-left">
-                    <tr className="border-b border-[#2a2825]">
-                      <th className="pb-3 pr-3 w-12 text-[10px] uppercase tracking-widest text-[#4a4640] font-medium">#</th>
-                      <th className="pb-3 pr-3 w-36 text-[10px] uppercase tracking-widest text-[#4a4640] font-medium">Fecha</th>
-                      <th className="pb-3 pr-3 text-[10px] uppercase tracking-widest text-[#4a4640] font-medium">Lugar</th>
-                      <th className="pb-3 pr-3 text-[10px] uppercase tracking-widest text-[#4a4640] font-medium">Banda</th>
+                    <tr className="border-b border-[var(--border-input)]">
+                      <th className="pb-3 pr-3 w-12 text-[10px] uppercase tracking-widest text-[var(--text-dim)] font-medium">#</th>
+                      <th className="pb-3 pr-3 w-36 text-[10px] uppercase tracking-widest text-[var(--text-dim)] font-medium">Fecha</th>
+                      <th className="pb-3 pr-3 text-[10px] uppercase tracking-widest text-[var(--text-dim)] font-medium">Lugar</th>
+                      <th className="pb-3 pr-3 text-[10px] uppercase tracking-widest text-[var(--text-dim)] font-medium">Banda</th>
                       <th className="pb-3 pr-3 w-11"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredRows.length === 0 && !loading ? (
                       <tr>
-                        <td className="py-5 text-[#4a4640]" colSpan={5}>
+                        <td className="py-5 text-[var(--text-dim)]" colSpan={5}>
                           {hasActiveFilters
                             ? 'No hay shows que coincidan con los filtros.'
                             : `No hay shows cargados para ${year}.`}
@@ -609,9 +605,9 @@ export default function Home() {
                     ) : null}
 
                     {filteredRows.map((r, idx) => (
-                      <tr key={r.id} className="group border-b border-[#222120] hover:bg-[var(--row-hover)] transition-colors">
-                        <td className="py-3.5 pr-3 font-mono text-xs text-[#4a4640]">{idx + 1}</td>
-                        <td className="py-3.5 pr-3 font-mono text-[13px] text-[#7d7870] tracking-wide">
+                      <tr key={r.id} className="group border-b border-[var(--border)] hover:bg-[var(--row-hover)] transition-colors">
+                        <td className="py-3.5 pr-3 font-mono text-xs text-[var(--text-dim)]">{idx + 1}</td>
+                        <td className="py-3.5 pr-3 font-mono text-[13px] text-[var(--text-muted)] tracking-wide">
                           {formatLatamDate(r.show_date)}
                         </td>
                         <td className="py-3.5 pr-3">
@@ -623,7 +619,7 @@ export default function Home() {
                         <td className="py-3.5 pr-3 text-right">
                           <button
                             onClick={() => setDeleteModal({ type: 'show', id: r.id, name: `${r.band} - ${r.venue}` })}
-                            className="rounded-md border border-transparent p-1.5 text-[#4a4640] opacity-0 group-hover:opacity-100 hover:text-[#bf3b3b] hover:border-[#bf3b3b] hover:bg-[var(--danger-dim)] cursor-pointer transition-all"
+                            className="rounded-md border border-transparent p-1.5 text-[var(--text-dim)] opacity-0 group-hover:opacity-100 hover:text-[var(--danger)] hover:border-[var(--danger)] hover:bg-[var(--danger-dim)] cursor-pointer transition-all"
                             title="Borrar show"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -638,24 +634,23 @@ export default function Home() {
           </>
         )}
 
-        {/* Delete modal */}
         {deleteModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-            <div className="rounded-xl border border-[#2a2825] bg-[#201f1d] p-7 shadow-2xl max-w-sm w-full mx-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)]">
+            <div className="rounded-xl border border-[var(--border-input)] bg-[var(--bg-modal)] p-7 shadow-2xl max-w-sm w-full mx-4">
               <h3 className="text-base font-medium mb-2">Confirmar eliminación</h3>
-              <p className="text-[13px] text-[#7d7870] mb-6 leading-relaxed">
-                ¿Estás seguro de que querés borrar <span className="font-semibold text-[#e5e0d8]">{deleteModal.name}</span>?
+              <p className="text-[13px] text-[var(--text-muted)] mb-6 leading-relaxed">
+                ¿Estás seguro de que querés borrar <span className="font-semibold text-[var(--text)]">{deleteModal.name}</span>?
               </p>
               <div className="flex gap-3 justify-end">
                 <button
                   onClick={() => setDeleteModal(null)}
-                  className="rounded-md border border-[#2a2825] bg-transparent px-4 py-2 text-sm text-[#7d7870] hover:text-[#e5e0d8] cursor-pointer transition-colors"
+                  className="rounded-md border border-[var(--border-input)] bg-transparent px-4 py-2 text-sm text-[var(--text-muted)] hover:text-[var(--text)] cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="rounded-md bg-[#bf3b3b] text-white px-4 py-2 text-sm font-medium cursor-pointer hover:bg-[#a83232] transition-colors"
+                  className="rounded-md bg-[var(--danger)] text-white px-4 py-2 text-sm font-medium cursor-pointer hover:bg-[var(--danger-hover)] transition-colors"
                 >
                   Borrar
                 </button>
@@ -664,10 +659,10 @@ export default function Home() {
           </div>
         )}
 
-        <footer className="mt-12 text-xs text-[#4a4640]">
+        <footer className="mt-12 text-xs text-[var(--text-dim)]">
           Hecho por{' '}
           <a
-            className="text-[#7d7870] underline underline-offset-3 hover:text-[#c9a23c] transition-colors"
+            className="text-[var(--text-muted)] underline underline-offset-3 hover:text-[var(--accent)] transition-colors"
             href="https://github.com/mdtrunzo"
             target="_blank"
           >

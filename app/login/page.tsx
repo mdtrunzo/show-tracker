@@ -1,6 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/browser'
+import ThemeToggle from '../components/ThemeToggle'
 
 export default function LoginPage() {
   async function handleGoogleLogin() {
@@ -14,15 +15,18 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0e0e0d] text-[#e5e0d8] flex items-center justify-center">
+    <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] flex items-center justify-center relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="max-w-sm w-full mx-4">
-        <div className="rounded-xl border border-[#222120] bg-[#1a1917] p-8 text-center">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-8 text-center">
           <h1 className="text-[22px] font-medium tracking-tight mb-2">Show Tracker</h1>
-          <p className="text-[13px] text-[#7d7870] mb-8">Trackeá tus shows por año.</p>
+          <p className="text-[13px] text-[var(--text-muted)] mb-8">Trackeá tus shows por año.</p>
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 rounded-md bg-[#c9a23c] text-[#0e0e0d] px-4 py-3 text-sm font-semibold cursor-pointer hover:brightness-110 transition-all"
+            className="w-full flex items-center justify-center gap-3 rounded-md bg-[var(--btn-bg)] text-[var(--btn-text)] border border-[var(--btn-border)] px-4 py-3 text-sm font-semibold cursor-pointer hover:bg-[var(--btn-hover)] transition-all"
           >
             <svg viewBox="0 0 24 24" width="20" height="20">
               <path
@@ -46,10 +50,10 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <p className="mt-6 text-center text-xs text-[#4a4640]">
+        <p className="mt-6 text-center text-xs text-[var(--text-dim)]">
           Hecho por{' '}
           <a
-            className="text-[#7d7870] underline underline-offset-3 hover:text-[#c9a23c] transition-colors"
+            className="text-[var(--text-muted)] underline underline-offset-3 hover:text-[var(--accent)] transition-colors"
             href="https://github.com/mdtrunzo"
             target="_blank"
           >

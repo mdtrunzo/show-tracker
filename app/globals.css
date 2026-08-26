@@ -1,13 +1,79 @@
 @import "tailwindcss";
 
 :root {
-  --accent-dim: rgba(201, 162, 60, 0.12);
-  --accent-glow: rgba(201, 162, 60, 0.06);
-  --danger-dim: rgba(191, 59, 59, 0.15);
-  --row-hover: rgba(201, 162, 60, 0.04);
+  --bg: #f3efe5;
+  --bg-card: #fbf7ee;
+  --bg-input: #f3efe5;
+  --bg-modal: #fbf7ee;
+  --border: #d6cbb6;
+  --border-input: #d6cbb6;
+  --text: #2f2a20;
+  --text-muted: #7a6c55;
+  --text-dim: #a3947b;
+  --accent: #7a6c55;
+  --accent-dim: rgba(122, 108, 85, 0.15);
+  --row-hover: rgba(47, 42, 32, 0.04);
+  --btn-bg: #e7dcc7;
+  --btn-text: #2f2a20;
+  --btn-border: #d6cbb6;
+  --btn-hover: #dacdae;
+  --danger: #f65f4e;
+  --danger-hover: #e04d3d;
+  --danger-dim: rgba(246, 95, 78, 0.12);
+  --overlay: rgba(0, 0, 0, 0.4);
+  --chart-bar: #a3947b;
+  --chart-line: #7a6c55;
+  --chart-grid: #d6cbb6;
+  --chart-tick: #2f2a20;
+  --tooltip-bg: #fbf7ee;
+  --tooltip-border: #d6cbb6;
+  --tooltip-text: #2f2a20;
+  --chart-cursor: rgba(122, 108, 85, 0.1);
+  --chart-line-cursor: rgba(122, 108, 85, 0.3);
 }
 
-body::before {
+.dark {
+  --bg: #0e0e0d;
+  --bg-card: #1a1917;
+  --bg-input: #141312;
+  --bg-modal: #201f1d;
+  --border: #222120;
+  --border-input: #2a2825;
+  --text: #e5e0d8;
+  --text-muted: #7d7870;
+  --text-dim: #4a4640;
+  --accent: #c9a23c;
+  --accent-dim: rgba(201, 162, 60, 0.12);
+  --row-hover: rgba(201, 162, 60, 0.04);
+  --btn-bg: #c9a23c;
+  --btn-text: #0e0e0d;
+  --btn-border: transparent;
+  --btn-hover: #ddb242;
+  --danger: #bf3b3b;
+  --danger-hover: #a83232;
+  --danger-dim: rgba(191, 59, 59, 0.15);
+  --overlay: rgba(0, 0, 0, 0.6);
+  --chart-bar: #c9a23c;
+  --chart-line: #c9a23c;
+  --chart-grid: #2a2825;
+  --chart-tick: #7d7870;
+  --tooltip-bg: #1a1917;
+  --tooltip-border: #2a2825;
+  --tooltip-text: #e5e0d8;
+  --chart-cursor: rgba(201, 162, 60, 0.06);
+  --chart-line-cursor: rgba(201, 162, 60, 0.3);
+}
+
+select option {
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+}
+
+.dark body::before {
   content: '';
   position: fixed;
   inset: 0;
@@ -16,13 +82,4 @@ body::before {
   background-size: 256px 256px;
   pointer-events: none;
   z-index: 9999;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.7);
-}
-
-select option {
-  background: #1a1917;
-  color: #e5e0d8;
 }
