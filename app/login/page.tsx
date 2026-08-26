@@ -14,15 +14,15 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f3efe5] text-[#2f2a20] flex items-center justify-center">
+    <main className="min-h-screen bg-[#0e0e0d] text-[#e5e0d8] flex items-center justify-center">
       <div className="max-w-sm w-full mx-4">
-        <div className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-8 text-center font-vintage">
-          <h1 className="text-3xl tracking-wide mb-2">Show Tracking</h1>
-          <p className="text-sm opacity-70 mb-8">Trackeá tus shows por año.</p>
+        <div className="rounded-xl border border-[#222120] bg-[#1a1917] p-8 text-center">
+          <h1 className="text-[22px] font-medium tracking-tight mb-2">Show Tracker</h1>
+          <p className="text-[13px] text-[#7d7870] mb-8">Trackeá tus shows por año.</p>
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 rounded-lg border border-[#d6cbb6] bg-[#e7dcc7] px-4 py-3 text-sm tracking-wide hover:bg-[#dacdae] cursor-pointer transition-colors"
+            className="w-full flex items-center justify-center gap-3 rounded-md bg-[#c9a23c] text-[#0e0e0d] px-4 py-3 text-sm font-semibold cursor-pointer hover:brightness-110 transition-all"
           >
             <svg viewBox="0 0 24 24" width="20" height="20">
               <path
@@ -46,10 +46,10 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <p className="mt-6 text-center text-xs opacity-50">
+        <p className="mt-6 text-center text-xs text-[#4a4640]">
           Hecho por{' '}
           <a
-            className="underline underline-offset-2"
+            className="text-[#7d7870] underline underline-offset-3 hover:text-[#c9a23c] transition-colors"
             href="https://github.com/mdtrunzo"
             target="_blank"
           >

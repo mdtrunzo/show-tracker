@@ -210,6 +210,10 @@ export default function Home() {
     }
   }
 
+  const inputClass = 'w-full rounded-md border border-[#2a2825] bg-[#141312] px-3 py-2.5 text-sm text-[#e5e0d8] placeholder-[#4a4640] focus:outline-none focus:border-[#c9a23c] focus:ring-2 focus:ring-[var(--accent-dim)] transition-colors'
+  const selectClass = 'w-full rounded-md border border-[#2a2825] bg-[#141312] px-3 py-2.5 text-sm text-[#e5e0d8] focus:outline-none focus:border-[#c9a23c] focus:ring-2 focus:ring-[var(--accent-dim)] transition-colors appearance-none'
+  const labelClass = 'block text-[10px] uppercase tracking-widest text-[#4a4640] mb-1.5'
+
   return !mounted || loading || saving ? (
     <div
       className="flex items-center justify-center mt-60 gap-2"
@@ -218,26 +222,27 @@ export default function Home() {
       <Image src="/loader2.gif" alt="Loading" width={400} height={400} />
     </div>
   ) : (
-    <main className="min-h-screen bg-[#f3efe5] text-[#2f2a20]">
-      <div className="mx-auto max-w-4xl px-5 py-10 font-vintage">
+    <main className="min-h-screen bg-[#0e0e0d] text-[#e5e0d8]">
+      <div className="mx-auto max-w-[880px] px-6 py-12">
+        {/* Header */}
         <header className="mb-8">
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-3xl md:text-4xl tracking-wide">
-                Show Tracking
+              <h1 className="text-[22px] font-medium tracking-tight">
+                Show Tracker
               </h1>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-1.5">
                 {avatar && (
                   <Image
                     src={avatar}
                     alt="Avatar"
-                    width={32}
-                    height={32}
-                    className="rounded-full mt-2"
+                    width={28}
+                    height={28}
+                    className="rounded-full"
                   />
                 )}
                 {userName && (
-                  <p className="mt-2 text-sm opacity-80">{userName}</p>
+                  <p className="text-[13px] text-[#7d7870]">{userName}</p>
                 )}
               </div>
             </div>
@@ -248,13 +253,13 @@ export default function Home() {
                   await createClient().auth.signOut()
                   router.push('/login')
                 }}
-                className="rounded-lg border border-[#d6cbb6] bg-[#fbf7ee] px-3 py-2 text-xs opacity-70 hover:opacity-100 cursor-pointer transition-opacity"
+                className="rounded-md border border-[#2a2825] bg-transparent px-3.5 py-2 text-xs text-[#7d7870] hover:text-[#e5e0d8] hover:border-[#4a4640] cursor-pointer transition-colors"
               >
                 Logout
               </button>
-              <label className="text-sm opacity-80">Año</label>
+              <span className="text-[11px] uppercase tracking-widest text-[#4a4640]">Año</span>
               <select
-                className="rounded-lg border border-[#d6cbb6] bg-[#fbf7ee] px-3 py-2 text-sm"
+                className="rounded-md border border-[#2a2825] bg-[#141312] px-3 py-2 text-sm font-mono text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
                 value={year}
                 onChange={(e) => setYear(Number(e.target.value))}
               >
@@ -267,45 +272,43 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-5 rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="text-sm opacity-85">
-                <span className="opacity-70">Total {year}:</span>{' '}
-                <span className="text-lg font-bold">{total}</span>
-              </div>
-            </div>
+          {/* Total bar */}
+          <div className="mt-6 rounded-xl border border-[#222120] bg-[#1a1917] px-5 py-4 flex items-center justify-between">
+            <span className="text-[13px] text-[#7d7870]">Total {year}</span>
+            <span className="font-mono text-[28px] font-semibold text-[#c9a23c] leading-none tracking-tight">{total}</span>
           </div>
-          {/* Tab buttons */}
-          <div className="mt-5 flex gap-2">
+
+          {/* Tabs */}
+          <div className="mt-6 flex gap-0.5 bg-[#1a1917] border border-[#222120] rounded-lg p-1 w-fit">
             <button
               onClick={() => setTab('shows')}
-              className={`rounded-lg border border-[#d6cbb6] px-4 py-2 text-sm tracking-wide cursor-pointer transition-colors ${
+              className={`rounded-md px-5 py-2 text-[13px] cursor-pointer transition-colors ${
                 tab === 'shows'
-                  ? 'bg-[#e7dcc7] font-bold'
-                  : 'bg-[#fbf7ee] opacity-70 hover:opacity-100'
+                  ? 'bg-[var(--accent-dim)] text-[#c9a23c] font-medium'
+                  : 'text-[#7d7870] hover:text-[#e5e0d8]'
               }`}
             >
               Shows
             </button>
             <button
               onClick={() => setTab('stats')}
-              className={`rounded-lg border border-[#d6cbb6] px-4 py-2 text-sm tracking-wide cursor-pointer transition-colors ${
+              className={`rounded-md px-5 py-2 text-[13px] cursor-pointer transition-colors ${
                 tab === 'stats'
-                  ? 'bg-[#e7dcc7] font-bold'
-                  : 'bg-[#fbf7ee] opacity-70 hover:opacity-100'
+                  ? 'bg-[var(--accent-dim)] text-[#c9a23c] font-medium'
+                  : 'text-[#7d7870] hover:text-[#e5e0d8]'
               }`}
             >
               Estadísticas
             </button>
             <button
               onClick={() => setTab('bands')}
-              className={`rounded-lg border border-[#d6cbb6] px-4 py-2 text-sm tracking-wide cursor-pointer transition-colors ${
+              className={`rounded-md px-5 py-2 text-[13px] cursor-pointer transition-colors ${
                 tab === 'bands'
-                  ? 'bg-[#e7dcc7] font-bold'
-                  : 'bg-[#fbf7ee] opacity-70 hover:opacity-100'
+                  ? 'bg-[var(--accent-dim)] text-[#c9a23c] font-medium'
+                  : 'text-[#7d7870] hover:text-[#e5e0d8]'
               }`}
             >
-              Agregá tus bandas
+              Tus bandas
             </button>
           </div>
         </header>
@@ -313,9 +316,12 @@ export default function Home() {
         {tab === 'stats' ? (
           <Stats rows={rows} year={year} />
         ) : tab === 'bands' ? (
-          <section className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-            <h2 className="text-lg tracking-wide mb-4">Tus bandas</h2>
-            <p className="text-sm opacity-70 mb-4">
+          <section className="rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-[10px] uppercase tracking-[0.12em] text-[#4a4640]">Tus bandas</span>
+              <div className="flex-1 h-px bg-[#222120]" />
+            </div>
+            <p className="text-[13px] text-[#7d7870] mb-5">
               Agregá los nombres de tus bandas para verlas en el selector.
             </p>
 
@@ -344,40 +350,40 @@ export default function Home() {
                   setSavingBand(false)
                 }
               }}
-              className="flex gap-2 mb-5"
+              className="flex gap-2.5 mb-6"
             >
               <input
                 value={newBandName}
                 onChange={(e) => setNewBandName(e.target.value)}
                 placeholder="Nombre de la banda…"
-                className="flex-1 rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                className={`flex-1 ${inputClass}`}
               />
               <button
                 type="submit"
                 disabled={savingBand}
-                className="rounded-lg border cursor-pointer border-[#d6cbb6] bg-[#e7dcc7] px-4 py-2 text-sm tracking-wide hover:bg-[#dacdae] disabled:opacity-60"
+                className="rounded-md bg-[#c9a23c] text-[#0e0e0d] px-5 py-2.5 text-sm font-semibold cursor-pointer hover:brightness-110 disabled:opacity-60 transition-all"
               >
                 {savingBand ? 'Guardando…' : 'Agregar'}
               </button>
             </form>
 
             {bandError && (
-              <p className="mb-3 text-sm text-[#f65f4e] opacity-95">{bandError}</p>
+              <p className="mb-3 text-sm text-[#bf3b3b]">{bandError}</p>
             )}
 
             {userBands.length === 0 ? (
-              <p className="text-sm opacity-60">No tenés bandas guardadas todavía.</p>
+              <p className="text-sm text-[#4a4640]">No tenés bandas guardadas todavía.</p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {userBands.map((b) => (
                   <div
                     key={b.id}
-                    className="flex items-center justify-between rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2"
+                    className="group flex items-center justify-between rounded-lg border border-[#222120] bg-[#141312] px-4 py-3"
                   >
                     <span className="text-sm">{b.name}</span>
                     <button
                       onClick={() => setDeleteModal({ type: 'band', id: b.id, name: b.name })}
-                      className="rounded-md border cursor-pointer border-[#d6cbb6] p-1.5 opacity-60 hover:opacity-100 hover:border-[#f65f4e] hover:text-[#f65f4e] transition-all"
+                      className="rounded-md border border-transparent p-1.5 text-[#4a4640] opacity-0 group-hover:opacity-100 hover:text-[#bf3b3b] hover:border-[#bf3b3b] hover:bg-[var(--danger-dim)] cursor-pointer transition-all"
                       title="Borrar banda"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -389,39 +395,43 @@ export default function Home() {
           </section>
         ) : (
           <>
-            <section className="mb-8 rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-              <h2 className="text-lg tracking-wide">Agregar show</h2>
+            {/* Add show form */}
+            <section className="mb-5 rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="text-[10px] uppercase tracking-[0.12em] text-[#4a4640]">Agregar show</span>
+                <div className="flex-1 h-px bg-[#222120]" />
+              </div>
 
               <form
                 onSubmit={onSubmit}
-                className="mt-4 grid gap-3 md:grid-cols-5 overflow-hidden"
+                className="grid gap-3 md:grid-cols-5 overflow-hidden"
               >
                 <div className="md:col-span-1 min-w-0">
-                  <label className="block text-xs opacity-70 mb-1">Fecha</label>
+                  <label className={labelClass}>Fecha</label>
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="block w-full min-w-0 max-w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                    className={`${inputClass} min-w-0 max-w-full`}
                   />
                 </div>
 
                 <div className="md:col-span-1">
-                  <label className="block text-xs opacity-70 mb-1">Lugar</label>
+                  <label className={labelClass}>Lugar</label>
                   <input
                     value={venue}
                     onChange={(e) => setVenue(e.target.value)}
                     placeholder="Niceto, Sullivans, etc"
-                    className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                    className={inputClass}
                   />
                 </div>
 
                 <div className="md:col-span-1">
-                  <label className="block text-xs opacity-70 mb-1">País</label>
+                  <label className={labelClass}>País</label>
                   <select
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                    className={selectClass}
                   >
                     {COUNTRIES.map((c) => (
                       <option key={c.code} value={c.code}>
@@ -432,7 +442,7 @@ export default function Home() {
                 </div>
 
                 <div className="md:col-span-1">
-                  <label className="block text-xs opacity-70 mb-1">Banda</label>
+                  <label className={labelClass}>Banda</label>
                   {userBands.length > 0 ? (
                     <>
                       <select
@@ -441,7 +451,7 @@ export default function Home() {
                           setBand(e.target.value)
                           if (e.target.value !== 'Otra') setCustomBand('')
                         }}
-                        className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                        className={selectClass}
                       >
                         <option value="">Seleccionar…</option>
                         {userBands.map((b) => (
@@ -456,7 +466,7 @@ export default function Home() {
                           value={customBand}
                           onChange={(e) => setCustomBand(e.target.value)}
                           placeholder="Nombre de la banda…"
-                          className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm mt-2"
+                          className={`${inputClass} mt-2`}
                         />
                       )}
                     </>
@@ -465,7 +475,7 @@ export default function Home() {
                       value={band}
                       onChange={(e) => setBand(e.target.value)}
                       placeholder="Nombre de la banda…"
-                      className="w-full rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                      className={inputClass}
                     />
                   )}
                 </div>
@@ -474,7 +484,7 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="w-full rounded-lg border cursor-pointer border-[#d6cbb6] bg-[#e7dcc7] px-4 py-2 text-sm tracking-wide hover:bg-[#dacdae] disabled:opacity-60"
+                    className="w-full rounded-md bg-[#c9a23c] text-[#0e0e0d] px-4 py-2.5 text-sm font-semibold cursor-pointer hover:brightness-110 disabled:opacity-60 transition-all"
                   >
                     {saving ? 'Guardando…' : 'Guardar'}
                   </button>
@@ -482,27 +492,29 @@ export default function Home() {
               </form>
 
               {error ? (
-                <p className="mt-3 text-sm text-[#f65f4e] opacity-95">
+                <p className="mt-3 text-sm text-[#bf3b3b]">
                   {error}
                 </p>
               ) : null}
             </section>
 
-            <section className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-              <div className="flex items-baseline justify-between gap-4 flex-wrap">
-                <h2 className="text-lg tracking-wide">Shows {year}</h2>
-                <p className="text-xs opacity-70">
+            {/* Shows table */}
+            <section className="rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+              <div className="flex items-baseline justify-between gap-4 flex-wrap mb-4">
+                <h2 className="text-[15px] font-medium">Shows {year}</h2>
+                <p className="text-[11px] text-[#4a4640] italic">
                   El # se calcula por orden de fecha dentro del año.
                 </p>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-end gap-3">
+              {/* Filters */}
+              <div className="flex flex-wrap items-end gap-3 pb-5 mb-5 border-b border-[#222120]">
                 <div>
-                  <label className="block text-xs opacity-70 mb-1">Banda</label>
+                  <label className={labelClass}>Banda</label>
                   <select
                     value={filterBand}
                     onChange={(e) => setFilterBand(e.target.value)}
-                    className="rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                    className="rounded-md border border-[#2a2825] bg-[#141312] px-2.5 py-2 text-xs text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
                   >
                     <option value="">Todas</option>
                     {uniqueBands.map((b) => (
@@ -511,11 +523,11 @@ export default function Home() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs opacity-70 mb-1">Lugar</label>
+                  <label className={labelClass}>Lugar</label>
                   <select
                     value={filterVenue}
                     onChange={(e) => setFilterVenue(e.target.value)}
-                    className="rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                    className="rounded-md border border-[#2a2825] bg-[#141312] px-2.5 py-2 text-xs text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
                   >
                     <option value="">Todos</option>
                     {uniqueVenues.map((v) => (
@@ -524,11 +536,11 @@ export default function Home() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs opacity-70 mb-1">País</label>
+                  <label className={labelClass}>País</label>
                   <select
                     value={filterCountry}
                     onChange={(e) => setFilterCountry(e.target.value)}
-                    className="rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                    className="rounded-md border border-[#2a2825] bg-[#141312] px-2.5 py-2 text-xs text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
                   >
                     <option value="">Todos</option>
                     {uniqueCountries.map((code) => {
@@ -542,11 +554,11 @@ export default function Home() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs opacity-70 mb-1">Mes</label>
+                  <label className={labelClass}>Mes</label>
                   <select
                     value={filterMonth}
                     onChange={(e) => setFilterMonth(e.target.value)}
-                    className="rounded-lg border border-[#d6cbb6] bg-[#f3efe5] px-3 py-2 text-sm"
+                    className="rounded-md border border-[#2a2825] bg-[#141312] px-2.5 py-2 text-xs text-[#e5e0d8] appearance-none focus:outline-none focus:border-[#c9a23c]"
                   >
                     <option value="">Todos</option>
                     {usedMonths.map((m) => {
@@ -567,28 +579,28 @@ export default function Home() {
                       setFilterCountry('')
                       setFilterMonth('')
                     }}
-                    className="rounded-lg border border-[#d6cbb6] bg-[#e7dcc7] px-3 py-2 text-xs tracking-wide cursor-pointer hover:bg-[#dacdae] transition-colors"
+                    className="rounded-md border border-[#2a2825] bg-transparent px-3 py-2 text-[11px] text-[#7d7870] cursor-pointer hover:text-[#c9a23c] hover:border-[#c9a23c] transition-colors"
                   >
                     Limpiar filtros
                   </button>
                 )}
               </div>
 
-              <div className="mt-4 overflow-x-auto">
+              <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-sm">
                   <thead className="text-left">
-                    <tr className="border-b border-[#d6cbb6] opacity-80">
-                      <th className="py-2 pr-3 w-14">#</th>
-                      <th className="py-2 pr-3 w-40">Fecha</th>
-                      <th className="py-2 pr-3">Lugar</th>
-                      <th className="py-2 pr-3">Banda</th>
-                      <th className="py-2 pr-3 w-24"></th>
+                    <tr className="border-b border-[#2a2825]">
+                      <th className="pb-3 pr-3 w-12 text-[10px] uppercase tracking-widest text-[#4a4640] font-medium">#</th>
+                      <th className="pb-3 pr-3 w-36 text-[10px] uppercase tracking-widest text-[#4a4640] font-medium">Fecha</th>
+                      <th className="pb-3 pr-3 text-[10px] uppercase tracking-widest text-[#4a4640] font-medium">Lugar</th>
+                      <th className="pb-3 pr-3 text-[10px] uppercase tracking-widest text-[#4a4640] font-medium">Banda</th>
+                      <th className="pb-3 pr-3 w-11"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredRows.length === 0 && !loading ? (
                       <tr>
-                        <td className="py-4 opacity-70" colSpan={5}>
+                        <td className="py-5 text-[#4a4640]" colSpan={5}>
                           {hasActiveFilters
                             ? 'No hay shows que coincidan con los filtros.'
                             : `No hay shows cargados para ${year}.`}
@@ -597,21 +609,21 @@ export default function Home() {
                     ) : null}
 
                     {filteredRows.map((r, idx) => (
-                      <tr key={r.id} className="border-b border-[#2b251b]">
-                        <td className="py-2 pr-3 opacity-80">{idx + 1}</td>
-                        <td className="py-2 pr-3">
+                      <tr key={r.id} className="group border-b border-[#222120] hover:bg-[var(--row-hover)] transition-colors">
+                        <td className="py-3.5 pr-3 font-mono text-xs text-[#4a4640]">{idx + 1}</td>
+                        <td className="py-3.5 pr-3 font-mono text-[13px] text-[#7d7870] tracking-wide">
                           {formatLatamDate(r.show_date)}
                         </td>
-                        <td className="py-2 pr-3">
-                          {r.venue} {countryFlag(r.country)}{' '}
+                        <td className="py-3.5 pr-3">
+                          {r.venue} <span className="ml-1">{countryFlag(r.country)}</span>
                         </td>
-                        <td className="py-2 pr-3">
+                        <td className="py-3.5 pr-3 font-medium">
                           {r.band}
                         </td>
-                        <td className="py-2 pr-3 text-right">
+                        <td className="py-3.5 pr-3 text-right">
                           <button
                             onClick={() => setDeleteModal({ type: 'show', id: r.id, name: `${r.band} - ${r.venue}` })}
-                            className="rounded-md border cursor-pointer border-[#d6cbb6] p-1.5 opacity-60 hover:opacity-100 hover:border-[#f65f4e] hover:text-[#f65f4e] transition-all"
+                            className="rounded-md border border-transparent p-1.5 text-[#4a4640] opacity-0 group-hover:opacity-100 hover:text-[#bf3b3b] hover:border-[#bf3b3b] hover:bg-[var(--danger-dim)] cursor-pointer transition-all"
                             title="Borrar show"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -626,23 +638,24 @@ export default function Home() {
           </>
         )}
 
+        {/* Delete modal */}
         {deleteModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-6 shadow-lg max-w-sm w-full mx-4 font-vintage">
-              <h3 className="text-lg tracking-wide mb-2">Confirmar eliminación</h3>
-              <p className="text-sm opacity-80 mb-5">
-                ¿Estás seguro de que querés borrar <span className="font-bold">{deleteModal.name}</span>?
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+            <div className="rounded-xl border border-[#2a2825] bg-[#201f1d] p-7 shadow-2xl max-w-sm w-full mx-4">
+              <h3 className="text-base font-medium mb-2">Confirmar eliminación</h3>
+              <p className="text-[13px] text-[#7d7870] mb-6 leading-relaxed">
+                ¿Estás seguro de que querés borrar <span className="font-semibold text-[#e5e0d8]">{deleteModal.name}</span>?
               </p>
               <div className="flex gap-3 justify-end">
                 <button
                   onClick={() => setDeleteModal(null)}
-                  className="rounded-lg border cursor-pointer border-[#d6cbb6] bg-[#fbf7ee] px-4 py-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+                  className="rounded-md border border-[#2a2825] bg-transparent px-4 py-2 text-sm text-[#7d7870] hover:text-[#e5e0d8] cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="rounded-lg border cursor-pointer border-[#f65f4e] bg-[#f65f4e] text-white px-4 py-2 text-sm hover:bg-[#e04d3d] transition-colors"
+                  className="rounded-md bg-[#bf3b3b] text-white px-4 py-2 text-sm font-medium cursor-pointer hover:bg-[#a83232] transition-colors"
                 >
                   Borrar
                 </button>
@@ -651,10 +664,10 @@ export default function Home() {
           </div>
         )}
 
-        <footer className="mt-8 text-xs opacity-60">
+        <footer className="mt-12 text-xs text-[#4a4640]">
           Hecho por{' '}
           <a
-            className="underline underline-offset-2"
+            className="text-[#7d7870] underline underline-offset-3 hover:text-[#c9a23c] transition-colors"
             href="https://github.com/mdtrunzo"
             target="_blank"
           >

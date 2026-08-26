@@ -93,14 +93,14 @@ export default function Stats({ rows, year }: { rows: ShowRow[]; year: number })
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-        <p className="opacity-70">No hay shows cargados para {year}.</p>
+      <div className="rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+        <p className="text-[#4a4640]">No hay shows cargados para {year}.</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
@@ -111,91 +111,94 @@ export default function Stats({ rows, year }: { rows: ShowRow[]; year: number })
         ].map((card) => (
           <div
             key={card.label}
-            className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-4 text-center"
+            className="rounded-xl border border-[#222120] bg-[#1a1917] p-5 text-center"
           >
-            <p className="text-xs opacity-70">{card.label}</p>
-            <p className="text-2xl font-bold mt-1">{card.value}</p>
+            <p className="text-[11px] uppercase tracking-widest text-[#4a4640] mb-1.5">{card.label}</p>
+            <p className="font-mono text-[32px] font-semibold text-[#c9a23c] leading-none tracking-tight">{card.value}</p>
           </div>
         ))}
       </div>
 
       {/* Shows per month bar chart */}
-      <div className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-        <h3 className="text-lg tracking-wide mb-4">Shows por mes</h3>
+      <div className="rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+        <h3 className="text-[15px] font-medium mb-5">Shows por mes</h3>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={monthlyData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#d6cbb6" />
-            <XAxis dataKey="mes" tick={{ fontSize: 12, fill: '#2f2a20' }} />
-            <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#2f2a20' }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2825" />
+            <XAxis dataKey="mes" tick={{ fontSize: 12, fill: '#7d7870' }} axisLine={{ stroke: '#2a2825' }} tickLine={{ stroke: '#2a2825' }} />
+            <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#7d7870' }} axisLine={{ stroke: '#2a2825' }} tickLine={{ stroke: '#2a2825' }} />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#fbf7ee',
-                border: '1px solid #d6cbb6',
+                backgroundColor: '#1a1917',
+                border: '1px solid #2a2825',
                 borderRadius: '8px',
                 fontSize: '13px',
+                color: '#e5e0d8',
               }}
+              cursor={{ fill: 'rgba(201, 162, 60, 0.06)' }}
             />
-            <Bar dataKey="shows" fill="#a3947b" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="shows" fill="#c9a23c" radius={[3, 3, 0, 0]} opacity={0.85} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
       {/* Cumulative growth line chart */}
-      <div className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-        <h3 className="text-lg tracking-wide mb-4">Crecimiento acumulado</h3>
+      <div className="rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+        <h3 className="text-[15px] font-medium mb-5">Crecimiento acumulado</h3>
         <ResponsiveContainer width="100%" height={280}>
           <LineChart data={cumulativeData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#d6cbb6" />
-            <XAxis dataKey="mes" tick={{ fontSize: 12, fill: '#2f2a20' }} />
-            <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#2f2a20' }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#2a2825" />
+            <XAxis dataKey="mes" tick={{ fontSize: 12, fill: '#7d7870' }} axisLine={{ stroke: '#2a2825' }} tickLine={{ stroke: '#2a2825' }} />
+            <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#7d7870' }} axisLine={{ stroke: '#2a2825' }} tickLine={{ stroke: '#2a2825' }} />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#fbf7ee',
-                border: '1px solid #d6cbb6',
+                backgroundColor: '#1a1917',
+                border: '1px solid #2a2825',
                 borderRadius: '8px',
                 fontSize: '13px',
+                color: '#e5e0d8',
               }}
+              cursor={{ stroke: 'rgba(201, 162, 60, 0.3)' }}
             />
             <Line
               type="monotone"
               dataKey="total"
-              stroke="#7a6c55"
+              stroke="#c9a23c"
               strokeWidth={2}
-              dot={{ fill: '#7a6c55', r: 4 }}
+              dot={{ fill: '#c9a23c', r: 4, strokeWidth: 0 }}
+              activeDot={{ fill: '#c9a23c', r: 6, strokeWidth: 0 }}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       {/* Top venues & bands */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Top venues */}
-        <div className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-          <h3 className="text-lg tracking-wide mb-3">Top lugares</h3>
-          <div className="space-y-2">
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+          <h3 className="text-[15px] font-medium mb-4">Top lugares</h3>
+          <div>
             {topVenues.map(([name, count], i) => (
-              <div key={name} className="flex items-center justify-between text-sm">
+              <div key={name} className="flex items-center justify-between text-[13px] py-2.5 border-b border-[#222120] last:border-b-0">
                 <span>
-                  <span className="opacity-50 mr-2">{i + 1}.</span>
+                  <span className="font-mono text-[11px] text-[#4a4640] mr-2.5 inline-block w-5">{i + 1}.</span>
                   {name}
                 </span>
-                <span className="font-bold">{count}</span>
+                <span className="font-mono font-semibold text-[#c9a23c]">{count}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Top bands */}
-        <div className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5">
-          <h3 className="text-lg tracking-wide mb-3">Top bandas</h3>
-          <div className="space-y-2">
+        <div className="rounded-xl border border-[#222120] bg-[#1a1917] p-6">
+          <h3 className="text-[15px] font-medium mb-4">Top bandas</h3>
+          <div>
             {topBands.map(([name, count], i) => (
-              <div key={name} className="flex items-center justify-between text-sm">
+              <div key={name} className="flex items-center justify-between text-[13px] py-2.5 border-b border-[#222120] last:border-b-0">
                 <span>
-                  <span className="opacity-50 mr-2">{i + 1}.</span>
+                  <span className="font-mono text-[11px] text-[#4a4640] mr-2.5 inline-block w-5">{i + 1}.</span>
                   {name}
                 </span>
-                <span className="font-bold">{count}</span>
+                <span className="font-mono font-semibold text-[#c9a23c]">{count}</span>
               </div>
             ))}
           </div>
@@ -204,10 +207,10 @@ export default function Stats({ rows, year }: { rows: ShowRow[]; year: number })
 
       {/* Best month highlight */}
       {bestMonth && (
-        <div className="rounded-2xl border border-[#d6cbb6] bg-[#fbf7ee] p-5 text-center">
-          <p className="text-xs opacity-70">Mejor mes</p>
-          <p className="text-2xl font-bold mt-1">{bestMonth.mes}</p>
-          <p className="text-sm opacity-70 mt-1">{bestMonth.shows} shows</p>
+        <div className="rounded-xl border border-[#222120] bg-[#1a1917] p-7 text-center">
+          <p className="text-[11px] uppercase tracking-widest text-[#4a4640] mb-1.5">Mejor mes</p>
+          <p className="font-mono text-[28px] font-semibold text-[#c9a23c]">{bestMonth.mes}</p>
+          <p className="text-[13px] text-[#7d7870] mt-1">{bestMonth.shows} shows</p>
         </div>
       )}
     </div>
