@@ -220,7 +220,7 @@ export default function Home() {
       className="flex items-center justify-center mt-60 gap-2"
       suppressHydrationWarning
     >
-      <Image src="/loader2.gif" alt="Loading" width={400} height={400} />
+      <Image src="/loader.gif" alt="Loading" width={400} height={400} />
     </div>
   ) : (
     <main className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
